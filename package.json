@@ -1,0 +1,37 @@
+{
+  "name": "gym-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "create-table": "tsx scripts/create-table.ts",
+    "clear-sessions": "tsx scripts/clear-sessions.ts",
+    "import-gym": "tsx scripts/import-gym.ts",
+    "list-sessions": "tsx scripts/list-sessions.ts",
+    "deploy": "sst deploy",
+    "remove": "sst remove"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.882.0",
+    "@aws-sdk/lib-dynamodb": "^3.882.0",
+    "next": "16.0.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^22.18.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "16.0.1",
+    "postcss": "^8.5.6",
+    "sst": "^3.0.0",
+    "tailwindcss": "^4.1.12",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
