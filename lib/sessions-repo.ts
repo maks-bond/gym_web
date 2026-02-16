@@ -8,6 +8,8 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { docClient, tables } from "./dynamo";
 import type {
+  BackupRecord,
+  BackupSnapshot,
   Exercise,
   GymSessionV2,
   GymSessionView,
@@ -114,6 +116,16 @@ export async function listLocations(): Promise<Location[]> {
   return ((out.Items || []) as Location[]).sort((a, b) => a.name.localeCompare(b.name));
 }
 
+export async function listAllLocationsRaw(): Promise<Location[]> {
+  const out = await docClient.send(
+    new ScanCommand({
+      TableName: tables.locations,
+    }),
+  );
+
+  return (out.Items || []) as Location[];
+}
+
 export async function upsertLocation(locationId: string, name: string): Promise<Location> {
   const now = nowIso();
   const item: Location = {
@@ -164,6 +176,16 @@ export async function listExercises(query = "", limit = 50): Promise<Exercise[]>
       return a.name.localeCompare(b.name);
     })
     .slice(0, limit);
+}
+
+export async function listAllExercisesRaw(): Promise<Exercise[]> {
+  const out = await docClient.send(
+    new ScanCommand({
+      TableName: tables.exercises,
+    }),
+  );
+
+  return (out.Items || []) as Exercise[];
 }
 
 export async function getExercisesByIds(ids: string[]): Promise<Map<string, Exercise>> {
@@ -220,6 +242,49 @@ export async function createExercise(input: {
   );
 
   return item;
+}
+
+export async function updateExercise(input: {
+  exerciseId: string;
+  name: string;
+  aliases?: string[];
+  iconKey?: string;
+}): Promise<Exercise> {
+  const exerciseId = input.exerciseId.trim();
+  if (!exerciseId) {
+    throw new Error("exerciseId is required");
+  }
+
+  const existingMap = await getExercisesByIds([exerciseId]);
+  const existing = existingMap.get(exerciseId);
+  if (!existing) {
+    throw new Error(`Exercise not found: ${exerciseId}`);
+  }
+
+  const name = input.name.trim().replace(/\s+/g, " ");
+  if (!name) {
+    throw new Error("Exercise name is required");
+  }
+
+  const aliases = uniq((input.aliases || []).map((x) => x.trim()).filter(Boolean));
+
+  const updated: Exercise = {
+    ...existing,
+    name,
+    nameLower: name.toLowerCase(),
+    aliases,
+    iconKey: input.iconKey?.trim() || existing.iconKey,
+    updatedAt: nowIso(),
+  };
+
+  await docClient.send(
+    new PutCommand({
+      TableName: tables.exercises,
+      Item: updated,
+    }),
+  );
+
+  return updated;
 }
 
 export async function ensureExercise(input: {
@@ -338,4 +403,125 @@ export async function listSessions(userId: string): Promise<GymSessionView[]> {
       name: exerciseMap.get(item.exerciseId)?.name || item.exerciseId,
     })),
   }));
+}
+
+export async function getSession(userId: string, sessionDate: string): Promise<GymSessionView | null> {
+  const out = await docClient.send(
+    new QueryCommand({
+      TableName: tables.sessionsV2,
+      KeyConditionExpression: "userId = :userId and sessionDate = :sessionDate",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+        ":sessionDate": sessionDate,
+      },
+      Limit: 1,
+    }),
+  );
+
+  const session = ((out.Items || []) as GymSessionV2[]).find(
+    (x) => !(x as { _deleted?: boolean })._deleted,
+  );
+  if (!session) return null;
+
+  const [exerciseMap, locationMap] = await Promise.all([
+    getExercisesByIds(session.exerciseItems.map((x) => x.exerciseId)),
+    getLocationsByIds([session.locationId]),
+  ]);
+
+  return {
+    ...session,
+    locationName: locationMap.get(session.locationId)?.name || "Unknown",
+    exerciseItems: session.exerciseItems.map((item) => ({
+      ...item,
+      name: exerciseMap.get(item.exerciseId)?.name || item.exerciseId,
+    })),
+  };
+}
+
+export async function createBackup(userId: string): Promise<Omit<BackupRecord, "payload">> {
+  const [sessionsV1, sessionsV2, exercises, locations] = await Promise.all([
+    listLegacySessions(userId),
+    listRawSessionsV2(userId),
+    listAllExercisesRaw(),
+    listAllLocationsRaw(),
+  ]);
+
+  const snapshot: BackupSnapshot = {
+    exportedAt: nowIso(),
+    userId,
+    sessionsV1,
+    sessionsV2,
+    exercises,
+    locations,
+  };
+
+  const backupId = snapshot.exportedAt;
+  const item: BackupRecord = {
+    userId,
+    backupId,
+    createdAt: snapshot.exportedAt,
+    schemaVersion: 2,
+    summary: {
+      sessionsV1: sessionsV1.length,
+      sessionsV2: sessionsV2.length,
+      exercises: exercises.length,
+      locations: locations.length,
+    },
+    payload: JSON.stringify(snapshot),
+  };
+
+  await docClient.send(
+    new PutCommand({
+      TableName: tables.backups,
+      Item: item,
+    }),
+  );
+
+  const { payload: _payload, ...meta } = item;
+  return meta;
+}
+
+export async function listBackups(
+  userId: string,
+  limit = 30,
+): Promise<Array<Omit<BackupRecord, "payload">>> {
+  const out = await docClient.send(
+    new QueryCommand({
+      TableName: tables.backups,
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+      ScanIndexForward: false,
+      Limit: limit,
+    }),
+  );
+
+  return ((out.Items || []) as BackupRecord[]).map((item) => {
+    const { payload: _payload, ...meta } = item;
+    return meta;
+  });
+}
+
+export async function getBackup(
+  userId: string,
+  backupId: string,
+): Promise<{ meta: Omit<BackupRecord, "payload">; snapshot: BackupSnapshot } | null> {
+  const out = await docClient.send(
+    new QueryCommand({
+      TableName: tables.backups,
+      KeyConditionExpression: "userId = :userId and backupId = :backupId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+        ":backupId": backupId,
+      },
+      Limit: 1,
+    }),
+  );
+
+  const item = ((out.Items || []) as BackupRecord[])[0];
+  if (!item) return null;
+
+  const { payload, ...meta } = item;
+  return { meta, snapshot: JSON.parse(payload) as BackupSnapshot };
 }

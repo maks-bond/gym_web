@@ -6,6 +6,10 @@
 
 declare module "sst" {
   export interface Resource {
+    "Backups": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "Exercises": {
       "name": string
       "type": "sst.aws.Dynamo"

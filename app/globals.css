@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f5f7fb;
+  --bg: #f2f2f3;
+  --bg-2: #e9eaec;
   --card: #ffffff;
-  --text: #111827;
-  --muted: #4b5563;
-  --line: #d1d5db;
-  --accent: #0f766e;
+  --text: #111111;
+  --muted: #5c6168;
+  --line: #d7d9de;
+  --line-strong: #b9bdc4;
+  --accent: #1d1f23;
+  --accent-2: #2e3238;
 }
 
 * {
@@ -15,9 +18,11 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top left, #eefaf6, var(--bg));
+  background:
+    radial-gradient(1200px 540px at -10% -10%, #ffffff, transparent 60%),
+    linear-gradient(165deg, var(--bg), var(--bg-2));
   color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 .container {
@@ -36,25 +41,50 @@ body {
 .header h1 {
   margin: 0;
   font-size: 1.7rem;
+  letter-spacing: 0.01em;
 }
 
 .nav {
   display: flex;
-  gap: 14px;
+  gap: 10px;
 }
 
-.nav a {
+.nav .nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
   color: var(--accent);
   text-decoration: none;
-  font-weight: 600;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.nav .nav-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav .nav-icon:hover {
+  border-color: var(--line-strong);
+  background: #f7f7f8;
 }
 
 .card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 12px;
+  padding: 14px 14px 12px;
   margin-bottom: 10px;
+  box-shadow: 0 8px 22px rgba(17, 17, 17, 0.04);
 }
 
 .card h3 {
@@ -85,6 +115,14 @@ body {
   border: 1px solid var(--line);
   padding: 10px;
   background: white;
+  color: var(--text);
+  outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 3px rgba(35, 39, 45, 0.08);
 }
 
 .textarea {
@@ -92,11 +130,107 @@ body {
 }
 
 .button {
-  border: none;
+  border: 1px solid var(--accent);
   background: var(--accent);
   color: white;
   padding: 10px 14px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background 120ms ease, transform 80ms ease;
+}
+
+.button:hover {
+  background: var(--accent-2);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  background: #8f949c;
+  border-color: #8f949c;
+}
+
+.button-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.button-small {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.button-exercise {
+  border-color: #8d939c;
+  background: #8d939c;
+}
+
+.button-exercise:hover {
+  background: #7f868f;
+}
+
+.button-exercise:disabled {
+  background: #b2b7be;
+  border-color: #b2b7be;
+}
+
+.calendar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.calendar-weekdays {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.calendar-cell {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.calendar-cell-button {
+  cursor: pointer;
+  width: 100%;
+  padding: 0;
+}
+
+.calendar-cell-button:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: #f5f6f7;
+}
+
+.calendar-cell.is-empty {
+  opacity: 0.45;
+}
+
+.calendar-cell.is-active {
+  background: #1f2227;
+  color: #fff;
+  border-color: #1f2227;
+  font-weight: 700;
 }
 
 .helper {

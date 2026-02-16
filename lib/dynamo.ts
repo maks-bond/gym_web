@@ -13,4 +13,5 @@ export const tables = {
   sessionsV2: process.env.DDB_TABLE_SESSIONS || "GymSessionsV2",
   exercises: process.env.DDB_TABLE_EXERCISES || "Exercises",
   locations: process.env.DDB_TABLE_LOCATIONS || "Locations",
+  backups: process.env.DDB_TABLE_BACKUPS || "Backups",
 };

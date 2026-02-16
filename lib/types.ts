@@ -55,3 +55,26 @@ export type GymSessionView = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type BackupSnapshot = {
+  exportedAt: string;
+  userId: string;
+  sessionsV1: LegacyGymSession[];
+  sessionsV2: GymSessionV2[];
+  exercises: Exercise[];
+  locations: Location[];
+};
+
+export type BackupRecord = {
+  userId: string;
+  backupId: string;
+  createdAt: string;
+  schemaVersion: number;
+  summary: {
+    sessionsV1: number;
+    sessionsV2: number;
+    exercises: number;
+    locations: number;
+  };
+  payload: string;
+};

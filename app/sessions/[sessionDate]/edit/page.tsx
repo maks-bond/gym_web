@@ -1,65 +1,72 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 type Exercise = { exerciseId: string; name: string; usageCount?: number };
 type Location = { locationId: string; name: string };
+type SessionPayload = {
+  sessionDate: string;
+  locationId: string;
+  exerciseItems: Array<{ exerciseId: string; name?: string }>;
+};
 
-export default function NewSessionPage() {
+export default function EditSessionPage() {
   const router = useRouter();
+  const params = useParams<{ sessionDate: string }>();
+  const sessionDate = Array.isArray(params.sessionDate) ? params.sessionDate[0] : params.sessionDate;
 
-  const [sessionDate, setSessionDate] = useState("");
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationId, setLocationId] = useState("unknown");
-
   const [query, setQuery] = useState("");
   const [library, setLibrary] = useState<Exercise[]>([]);
   const [selected, setSelected] = useState<Exercise[]>([]);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const date = new URLSearchParams(window.location.search).get("date")?.trim() || "";
-    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      setSessionDate(date);
+    async function loadData() {
+      if (!sessionDate) return;
+
+      const [locationsRes, exercisesRes, sessionRes] = await Promise.all([
+        fetch("/api/locations"),
+        fetch("/api/exercises?limit=500"),
+        fetch(`/api/sessions?sessionDate=${encodeURIComponent(sessionDate)}`),
+      ]);
+
+      const locationsPayload = await locationsRes.json();
+      const exercisesPayload = await exercisesRes.json();
+      const sessionPayload = await sessionRes.json();
+
+      if (!locationsRes.ok) throw new Error(locationsPayload.error || "Failed to load locations");
+      if (!exercisesRes.ok) throw new Error(exercisesPayload.error || "Failed to load exercise list");
+      if (!sessionRes.ok) throw new Error(sessionPayload.error || "Failed to load session");
+
+      const loadedLocations = (locationsPayload.locations || []) as Location[];
+      const loadedExercises = (exercisesPayload.exercises || []) as Exercise[];
+      const session = sessionPayload.session as SessionPayload;
+
+      setLocations(loadedLocations);
+      setLibrary(loadedExercises);
+      setLocationId(session.locationId || "unknown");
+
+      const byId = new Map(loadedExercises.map((x) => [x.exerciseId, x]));
+      setSelected(
+        session.exerciseItems.map((item) => byId.get(item.exerciseId) || {
+          exerciseId: item.exerciseId,
+          name: item.name || item.exerciseId,
+        }),
+      );
     }
-  }, []);
 
-  useEffect(() => {
-    async function loadLocations() {
-      const res = await fetch("/api/locations");
-      const payload = await res.json();
-      const rows = (payload.locations || []) as Location[];
-      setLocations(rows);
-      if (rows.find((x) => x.locationId === "unknown")) {
-        setLocationId("unknown");
-      } else if (rows[0]) {
-        setLocationId(rows[0].locationId);
-      }
-    }
-
-    loadLocations().catch(() => {
-      setError("Failed to load locations");
-    });
-  }, []);
-
-  useEffect(() => {
-    async function loadExercises() {
-      const params = new URLSearchParams({ q: "", limit: "500" });
-      const res = await fetch(`/api/exercises?${params.toString()}`);
-      const payload = await res.json();
-      setLibrary((payload.exercises || []) as Exercise[]);
-    }
-
-    loadExercises().catch(() => {
-      setError("Failed to load exercise list");
-    });
-  }, []);
+    loadData()
+      .catch((err) => setError(err instanceof Error ? err.message : "Unknown error"))
+      .finally(() => setIsLoading(false));
+  }, [sessionDate]);
 
   const selectedIds = useMemo(() => new Set(selected.map((x) => x.exerciseId)), [selected]);
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return library;
@@ -77,12 +84,14 @@ export default function NewSessionPage() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!sessionDate) return;
+
     setIsSaving(true);
     setError(null);
 
     try {
       const response = await fetch("/api/sessions", {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           sessionDate,
@@ -91,9 +100,9 @@ export default function NewSessionPage() {
         }),
       });
 
+      const payload = await response.json();
       if (!response.ok) {
-        const payload = await response.json();
-        throw new Error(payload.error || "Failed to save session");
+        throw new Error(payload.error || "Failed to update session");
       }
 
       router.push("/");
@@ -106,27 +115,29 @@ export default function NewSessionPage() {
 
   return (
     <section>
-      <h2>New Session</h2>
+      {sessionDate ? <p className="helper">{sessionDate}</p> : null}
+
       <form onSubmit={onSubmit} className="card">
-        <div className="row">
-          <label htmlFor="session-date">Date</label>
-          <input
-            id="session-date"
-            className="input"
-            type="date"
-            required
-            value={sessionDate}
-            onChange={(e) => setSessionDate(e.target.value)}
-          />
+        {isLoading ? <p className="helper">Loading session...</p> : null}
+
+        <div style={{ marginBottom: 12 }}>
+          <button
+            className="button"
+            type="submit"
+            disabled={isLoading || isSaving || selected.length === 0}
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </button>
         </div>
 
-        <div className="row" style={{ marginTop: 12 }}>
+        <div className="row">
           <label htmlFor="location">Location</label>
           <select
             id="location"
             className="input"
             value={locationId}
             onChange={(e) => setLocationId(e.target.value)}
+            disabled={isLoading}
           >
             {locations.map((loc) => (
               <option key={loc.locationId} value={loc.locationId}>
@@ -144,6 +155,7 @@ export default function NewSessionPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type e.g. Be"
+            disabled={isLoading}
           />
         </div>
 
@@ -158,8 +170,9 @@ export default function NewSessionPage() {
                 className="button button-exercise"
                 style={{ marginRight: 8, marginBottom: 8 }}
                 onClick={() => removeExercise(exercise.exerciseId)}
+                disabled={isLoading}
               >
-                {exercise.name} ×
+                {exercise.name} x
               </button>
             ))}
           </div>
@@ -177,6 +190,7 @@ export default function NewSessionPage() {
                   className="button button-exercise"
                   style={{ marginRight: 8, marginBottom: 8 }}
                   onClick={() => addExercise(exercise)}
+                  disabled={isLoading}
                 >
                   + {exercise.name}
                 </button>
@@ -188,9 +202,9 @@ export default function NewSessionPage() {
           <button
             className="button"
             type="submit"
-            disabled={isSaving || selected.length === 0 || !sessionDate}
+            disabled={isLoading || isSaving || selected.length === 0}
           >
-            {isSaving ? "Saving..." : "Save Session"}
+            {isSaving ? "Saving..." : "Save"}
           </button>
         </div>
 

@@ -1,4 +1,6 @@
 import { listSessions } from "@/lib/sessions-repo";
+import Link from "next/link";
+import SessionsCalendar from "./components/sessions-calendar";
 
 const USER_ID = "me";
 export const dynamic = "force-dynamic";
@@ -8,13 +10,21 @@ export default async function HomePage() {
 
   return (
     <section>
-      <h2>All Sessions</h2>
+      <SessionsCalendar sessionDates={sessions.map((x) => x.sessionDate)} />
       {sessions.length === 0 ? <p>No sessions yet.</p> : null}
       {sessions.map((session) => (
         <article key={`${session.userId}-${session.sessionDate}`} className="card">
-          <h3>
-            {session.sessionDate} <span style={{ color: "#4b5563" }}>({session.locationName})</span>
-          </h3>
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+            <h3>
+              {session.sessionDate} <span style={{ color: "#4b5563" }}>({session.locationName})</span>
+            </h3>
+            <Link
+              href={`/sessions/${session.sessionDate}/edit`}
+              className="button button-link button-small"
+            >
+              Edit
+            </Link>
+          </div>
           <ul>
             {session.exerciseItems.map((exercise, idx) => (
               <li key={`${session.sessionDate}-${exercise.exerciseId}-${idx}`}>{exercise.name}</li>
