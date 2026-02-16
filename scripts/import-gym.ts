@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseGymTxt } from "../lib/parse-gym-txt";
-import { upsertSession } from "../lib/sessions-repo";
+import { upsertLegacySession } from "../lib/sessions-repo";
 
 const USER_ID = process.env.USER_ID || "me";
 const IMPORT_MIN_DATE = process.env.IMPORT_MIN_DATE || "2025-01-01";
@@ -12,6 +12,7 @@ async function run() {
   const parsedSessions = parseGymTxt(raw).filter(
     (session) => session.sessionDate >= IMPORT_MIN_DATE,
   );
+
   const mergedByDate = new Map<
     string,
     { exercises: string[]; notesRawParts: string[]; seen: Set<string> }
@@ -50,12 +51,12 @@ async function run() {
     .sort((a, b) => (a.sessionDate < b.sessionDate ? 1 : -1));
 
   for (const session of sessions) {
-    await upsertSession(USER_ID, session.sessionDate, session.exercises, session.notesRaw);
+    await upsertLegacySession(USER_ID, session.sessionDate, session.exercises, session.notesRaw);
     console.log(`Imported ${session.sessionDate} (${session.exercises.length} exercises)`);
   }
 
   console.log(
-    `Done. Imported ${sessions.length} sessions from ${gymFilePath} (min date ${IMPORT_MIN_DATE}).`,
+    `Done. Imported ${sessions.length} sessions into legacy table from ${gymFilePath} (min date ${IMPORT_MIN_DATE}).`,
   );
 }
 

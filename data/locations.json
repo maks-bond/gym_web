@@ -1,0 +1,6 @@
+[
+  { "locationId": "planet-fitness", "name": "Planet Fitness" },
+  { "locationId": "work", "name": "Work" },
+  { "locationId": "street", "name": "Street" },
+  { "locationId": "unknown", "name": "Unknown" }
+]

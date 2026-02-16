@@ -1,6 +1,6 @@
 # gym_web
 
-Simple gym activity app using Next.js + DynamoDB.
+Simple gym activity app using Next.js + DynamoDB, deployed with SST.
 
 ## Website
 
@@ -20,6 +20,7 @@ This project uses:
 aws sso login --profile AdministratorAccess-084375563972
 aws sts get-caller-identity --profile AdministratorAccess-084375563972
 export AWS_PROFILE=AdministratorAccess-084375563972
+export AWS_REGION=us-east-2
 ```
 
 ## Setup
@@ -29,40 +30,62 @@ cp .env.example .env.local
 npm install
 ```
 
-## Create DynamoDB Table
+## Deploy
 
 ```bash
-npm run create-table
+npm run deploy
 ```
 
-## Import Existing Notes (`gym.txt`)
+SST outputs:
+
+- `url`
+- `sessionsV1TableName`
+- `sessionsTableName`
+- `exercisesTableName`
+- `locationsTableName`
+
+## Data Model
+
+- Legacy backup table: `sessionsV1` (`DDB_TABLE_SESSIONS_V1`)
+- Normalized sessions table: `sessionsV2` (`DDB_TABLE_SESSIONS`)
+- Exercise catalog table: `DDB_TABLE_EXERCISES`
+- Locations table: `DDB_TABLE_LOCATIONS`
+
+## Normalization / Migration Flow
+
+1. Seed locations:
 
 ```bash
-npm run import-gym
+npm run seed-locations
 ```
 
-This parses your `gym.txt` and stores sessions in DynamoDB (`GymSessions`).
-Duplicate same-day entries are merged into one session (with combined exercises).
-For scripts, set min date in shell before import:
+2. Generate exercise review report (for duplicate review):
 
 ```bash
-export IMPORT_MIN_DATE=2025-06-01
+npm run review-exercises
 ```
 
-## See Current Sessions In Terminal
+This writes `data/exercise-review.json`.
+
+3. Migrate legacy sessions to normalized schema:
 
 ```bash
-LIMIT=30 npm run list-sessions
+npm run migrate-v1-to-v2
 ```
 
-## Re-import Cleanly (if old import had bad years)
+4. Verify normalized sessions:
 
 ```bash
-npm run clear-sessions
-npm run import-gym
+LIMIT=40 npm run list-sessions
 ```
 
-## Run Web App
+## Legacy Utilities
+
+- List legacy sessions: `npm run list-sessions-v1`
+- Clear legacy sessions: `npm run clear-sessions`
+- Import `gym.txt` into legacy table: `npm run import-gym`
+
+## Run Web App Locally
 
 ```bash
 npm run dev
@@ -70,19 +93,15 @@ npm run dev
 
 Then open `http://localhost:3000`.
 
-## Public Deployment (AWS via SST)
+## API Endpoints
 
-```bash
-export AWS_PROFILE=AdministratorAccess-084375563972
-export AWS_REGION=us-east-2
-npm install
-npm run deploy
-```
+- `GET /api/sessions`
+- `POST /api/sessions`
+- `GET /api/exercises?q=...&limit=...`
+- `POST /api/exercises`
+- `GET /api/locations`
 
-`sst deploy` outputs the public site URL and managed DynamoDB table name.
+## Hidden Exercise Create Page
 
-## App Features (MVP)
-
-- View sessions ordered by date
-- Add a new session with date and exercises
-- Data is stored in DynamoDB under `userId=me`
+- Route: `/exercises/new`
+- Not linked in top navigation by design.

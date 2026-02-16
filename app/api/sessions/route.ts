@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listSessions, upsertSession } from "@/lib/sessions-repo";
+import { listSessions, listLocations, upsertSessionV2 } from "@/lib/sessions-repo";
 
 const USER_ID = "me";
 
@@ -21,12 +21,14 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json()) as {
       sessionDate?: string;
-      exercises?: string[];
+      locationId?: string;
+      exerciseIds?: string[];
       notesRaw?: string;
     };
 
     const sessionDate = (body.sessionDate || "").trim();
-    const exercises = (body.exercises || []).map((x) => x.trim()).filter(Boolean);
+    const locationId = (body.locationId || "unknown").trim();
+    const exerciseIds = (body.exerciseIds || []).map((x) => x.trim()).filter(Boolean);
 
     if (!isIsoDate(sessionDate)) {
       return NextResponse.json(
@@ -35,14 +37,29 @@ export async function POST(req: Request) {
       );
     }
 
-    if (exercises.length === 0) {
+    if (exerciseIds.length === 0) {
       return NextResponse.json(
         { error: "At least one exercise is required" },
         { status: 400 },
       );
     }
 
-    const session = await upsertSession(USER_ID, sessionDate, exercises, body.notesRaw);
+    const validLocationIds = new Set((await listLocations()).map((x) => x.locationId));
+    if (!validLocationIds.has(locationId)) {
+      return NextResponse.json(
+        { error: `Invalid locationId: ${locationId}` },
+        { status: 400 },
+      );
+    }
+
+    const session = await upsertSessionV2({
+      userId: USER_ID,
+      sessionDate,
+      locationId,
+      exerciseItems: exerciseIds.map((exerciseId) => ({ exerciseId })),
+      notesRaw: body.notesRaw,
+    });
+
     return NextResponse.json({ session }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

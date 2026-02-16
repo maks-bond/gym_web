@@ -9,7 +9,7 @@ export default $config({
     };
   },
   async run() {
-    const sessionsTable = new sst.aws.Dynamo("GymSessions", {
+    const sessionsV1Table = new sst.aws.Dynamo("GymSessions", {
       fields: {
         userId: "string",
         sessionDate: "string",
@@ -20,17 +20,52 @@ export default $config({
       },
     });
 
+    const sessionsV2Table = new sst.aws.Dynamo("Sessions", {
+      fields: {
+        userId: "string",
+        sessionDate: "string",
+      },
+      primaryIndex: {
+        hashKey: "userId",
+        rangeKey: "sessionDate",
+      },
+    });
+
+    const exercisesTable = new sst.aws.Dynamo("Exercises", {
+      fields: {
+        exerciseId: "string",
+      },
+      primaryIndex: {
+        hashKey: "exerciseId",
+      },
+    });
+
+    const locationsTable = new sst.aws.Dynamo("Locations", {
+      fields: {
+        locationId: "string",
+      },
+      primaryIndex: {
+        hashKey: "locationId",
+      },
+    });
+
     const web = new sst.aws.Nextjs("Web", {
       path: ".",
-      link: [sessionsTable],
+      link: [sessionsV1Table, sessionsV2Table, exercisesTable, locationsTable],
       environment: {
-        DDB_TABLE_NAME: sessionsTable.name,
+        DDB_TABLE_SESSIONS_V1: sessionsV1Table.name,
+        DDB_TABLE_SESSIONS: sessionsV2Table.name,
+        DDB_TABLE_EXERCISES: exercisesTable.name,
+        DDB_TABLE_LOCATIONS: locationsTable.name,
       },
     });
 
     return {
       url: web.url,
-      tableName: sessionsTable.name,
+      sessionsV1TableName: sessionsV1Table.name,
+      sessionsTableName: sessionsV2Table.name,
+      exercisesTableName: exercisesTable.name,
+      locationsTableName: locationsTable.name,
     };
   },
 });

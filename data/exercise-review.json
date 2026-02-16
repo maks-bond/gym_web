@@ -1,0 +1,1016 @@
+{
+  "generatedAt": "2026-02-16T22:23:03.578Z",
+  "userId": "me",
+  "sessions": 134,
+  "uniqueRawExercises": 136,
+  "uniqueCanonicalExercises": 54,
+  "raw": [
+    {
+      "name": "Work bench press",
+      "count": 20
+    },
+    {
+      "name": "Pf back",
+      "count": 18
+    },
+    {
+      "name": "Bench press",
+      "count": 17
+    },
+    {
+      "name": "Pf chest",
+      "count": 14
+    },
+    {
+      "name": "Deadlift",
+      "count": 12
+    },
+    {
+      "name": "Shoulder press",
+      "count": 12
+    },
+    {
+      "name": "Work deadlift",
+      "count": 10
+    },
+    {
+      "name": "Lower abs",
+      "count": 8
+    },
+    {
+      "name": "Run",
+      "count": 8
+    },
+    {
+      "name": "Row",
+      "count": 6
+    },
+    {
+      "name": "Work shoulder press",
+      "count": 6
+    },
+    {
+      "name": "Work squats",
+      "count": 6
+    },
+    {
+      "name": "Dumbbell back",
+      "count": 5
+    },
+    {
+      "name": "Squats",
+      "count": 5
+    },
+    {
+      "name": "Pf chest press",
+      "count": 4
+    },
+    {
+      "name": "Work pull ups",
+      "count": 4
+    },
+    {
+      "name": "Bicep curls barbell",
+      "count": 3
+    },
+    {
+      "name": "Dumbbell deadlift",
+      "count": 3
+    },
+    {
+      "name": "Pf leg curl",
+      "count": 3
+    },
+    {
+      "name": "Pf leg press",
+      "count": 3
+    },
+    {
+      "name": "Pf seated leg press",
+      "count": 3
+    },
+    {
+      "name": "Pf shoulder press",
+      "count": 3
+    },
+    {
+      "name": "Triceps machine",
+      "count": 3
+    },
+    {
+      "name": "Work back one arm dumbbell",
+      "count": 3
+    },
+    {
+      "name": "Work dumbbell deadlift",
+      "count": 3
+    },
+    {
+      "name": "Bicep curls dumbbells",
+      "count": 2
+    },
+    {
+      "name": "Dumbbell shoulder press",
+      "count": 2
+    },
+    {
+      "name": "Inclined bench dumbbell",
+      "count": 2
+    },
+    {
+      "name": "Inclined dumbbell press",
+      "count": 2
+    },
+    {
+      "name": "Pf bicep curls",
+      "count": 2
+    },
+    {
+      "name": "Pf biceps curls machine",
+      "count": 2
+    },
+    {
+      "name": "Pf deadlift",
+      "count": 2
+    },
+    {
+      "name": "Pf seated leg curl",
+      "count": 2
+    },
+    {
+      "name": "Row barbell",
+      "count": 2
+    },
+    {
+      "name": "Run 10k",
+      "count": 2
+    },
+    {
+      "name": "Work back one armed dumbbell",
+      "count": 2
+    },
+    {
+      "name": "Work shoulders dumbbell",
+      "count": 2
+    },
+    {
+      "name": "Work squat",
+      "count": 2
+    },
+    {
+      "name": "Work triceps rope",
+      "count": 2
+    },
+    {
+      "name": "Work wrist curls",
+      "count": 2
+    },
+    {
+      "name": "Back dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Back dumbbell bench",
+      "count": 1
+    },
+    {
+      "name": "Back dumbbells",
+      "count": 1
+    },
+    {
+      "name": "Back dummbell",
+      "count": 1
+    },
+    {
+      "name": "Back horizontal machine",
+      "count": 1
+    },
+    {
+      "name": "Barbell biceps",
+      "count": 1
+    },
+    {
+      "name": "Barbell row (back)",
+      "count": 1
+    },
+    {
+      "name": "Bicep curls",
+      "count": 1
+    },
+    {
+      "name": "Biceps",
+      "count": 1
+    },
+    {
+      "name": "Biceps machine",
+      "count": 1
+    },
+    {
+      "name": "Body weight squats",
+      "count": 1
+    },
+    {
+      "name": "Butterfly chest dual adjustable pulley",
+      "count": 1
+    },
+    {
+      "name": "Dumbbell Back",
+      "count": 1
+    },
+    {
+      "name": "Dumbbell back one arm",
+      "count": 1
+    },
+    {
+      "name": "Dumbbell biceps curls",
+      "count": 1
+    },
+    {
+      "name": "Dumbbell chest",
+      "count": 1
+    },
+    {
+      "name": "dumbbell deadlift",
+      "count": 1
+    },
+    {
+      "name": "Dumbbell inclined press",
+      "count": 1
+    },
+    {
+      "name": "Dumbbell shrugs",
+      "count": 1
+    },
+    {
+      "name": "GWork bench press",
+      "count": 1
+    },
+    {
+      "name": "Home dips",
+      "count": 1
+    },
+    {
+      "name": "Inclined bench",
+      "count": 1
+    },
+    {
+      "name": "Inclined bench press dumbbells",
+      "count": 1
+    },
+    {
+      "name": "Inclined bench press smith machine",
+      "count": 1
+    },
+    {
+      "name": "Inclined dumbbell chest press",
+      "count": 1
+    },
+    {
+      "name": "Leg abs",
+      "count": 1
+    },
+    {
+      "name": "Machine triceps",
+      "count": 1
+    },
+    {
+      "name": "One arm dumbbell",
+      "count": 1
+    },
+    {
+      "name": "One arm dumbbell back",
+      "count": 1
+    },
+    {
+      "name": "PF back",
+      "count": 1
+    },
+    {
+      "name": "Pf bench press",
+      "count": 1
+    },
+    {
+      "name": "PF bench press",
+      "count": 1
+    },
+    {
+      "name": "Pf biceps curl machine",
+      "count": 1
+    },
+    {
+      "name": "Pf Calf extension",
+      "count": 1
+    },
+    {
+      "name": "Pf chest 3 sets",
+      "count": 1
+    },
+    {
+      "name": "Pf Chest Incline press machine",
+      "count": 1
+    },
+    {
+      "name": "Pf Chest press",
+      "count": 1
+    },
+    {
+      "name": "Pf deadlift dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Pf dumbbell deadlift",
+      "count": 1
+    },
+    {
+      "name": "Pf dumbbell trapezoid",
+      "count": 1
+    },
+    {
+      "name": "Pf horizontal back",
+      "count": 1
+    },
+    {
+      "name": "Pf Leg press",
+      "count": 1
+    },
+    {
+      "name": "Pf leg raise abs",
+      "count": 1
+    },
+    {
+      "name": "Pf lower abs",
+      "count": 1
+    },
+    {
+      "name": "Pf Quads machine",
+      "count": 1
+    },
+    {
+      "name": "Pf Seated leg press",
+      "count": 1
+    },
+    {
+      "name": "Pf shoulder",
+      "count": 1
+    },
+    {
+      "name": "Pf shoulder press machine",
+      "count": 1
+    },
+    {
+      "name": "Pf squat",
+      "count": 1
+    },
+    {
+      "name": "Pf trapezoid barbell",
+      "count": 1
+    },
+    {
+      "name": "Pf trapezoid dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Pf triceps",
+      "count": 1
+    },
+    {
+      "name": "Pull ups",
+      "count": 1
+    },
+    {
+      "name": "Push ups at home",
+      "count": 1
+    },
+    {
+      "name": "Shoulder press barbell",
+      "count": 1
+    },
+    {
+      "name": "Shoulder press dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Squats dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Triceps",
+      "count": 1
+    },
+    {
+      "name": "Work 10 pullups",
+      "count": 1
+    },
+    {
+      "name": "Work back",
+      "count": 1
+    },
+    {
+      "name": "Work barbell bicep curls",
+      "count": 1
+    },
+    {
+      "name": "Work barbell biceps",
+      "count": 1
+    },
+    {
+      "name": "Work barbell biceps curl",
+      "count": 1
+    },
+    {
+      "name": "Work barbell biceps curls",
+      "count": 1
+    },
+    {
+      "name": "Work Barbell biceps curls",
+      "count": 1
+    },
+    {
+      "name": "Work barbell shoulder press",
+      "count": 1
+    },
+    {
+      "name": "Work barbell trapezoid",
+      "count": 1
+    },
+    {
+      "name": "Work Bench press",
+      "count": 1
+    },
+    {
+      "name": "Work bench press.",
+      "count": 1
+    },
+    {
+      "name": "Work bicep curls",
+      "count": 1
+    },
+    {
+      "name": "Work bicep curls barbell",
+      "count": 1
+    },
+    {
+      "name": "Work Bicep curls barbell",
+      "count": 1
+    },
+    {
+      "name": "Work bicep curls on dual adjustable pulley",
+      "count": 1
+    },
+    {
+      "name": "Work deadlift (3 sets)",
+      "count": 1
+    },
+    {
+      "name": "Work deadlift dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Work dips",
+      "count": 1
+    },
+    {
+      "name": "Work dumbbell back",
+      "count": 1
+    },
+    {
+      "name": "Work front squats",
+      "count": 1
+    },
+    {
+      "name": "Work incline bench dumbbell press",
+      "count": 1
+    },
+    {
+      "name": "Work inclined back one arm dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Work inclined bench chest",
+      "count": 1
+    },
+    {
+      "name": "Work inclined bench dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Work one arm back partial",
+      "count": 1
+    },
+    {
+      "name": "Work one arm dumbbell back",
+      "count": 1
+    },
+    {
+      "name": "Work one arm dumbell bench",
+      "count": 1
+    },
+    {
+      "name": "Work one-arm dumbbell row on bench",
+      "count": 1
+    },
+    {
+      "name": "Work pullups",
+      "count": 1
+    },
+    {
+      "name": "Work Shoukder press barbell",
+      "count": 1
+    },
+    {
+      "name": "Work shoulder dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Work Shoulder press",
+      "count": 1
+    },
+    {
+      "name": "Work shoulder press barbell",
+      "count": 1
+    },
+    {
+      "name": "Work shoulder press dumbbell",
+      "count": 1
+    },
+    {
+      "name": "Work something",
+      "count": 1
+    },
+    {
+      "name": "Work squats with barbell",
+      "count": 1
+    },
+    {
+      "name": "Work trapezoid barbell",
+      "count": 1
+    },
+    {
+      "name": "Work triceps",
+      "count": 1
+    }
+  ],
+  "canonicalGroups": [
+    {
+      "canonical": "Back Machine Row",
+      "aliases": [
+        "Pf back",
+        "PF back",
+        "Pf horizontal back"
+      ],
+      "normalizedKeySample": "back"
+    },
+    {
+      "canonical": "Barbell Bicep Curls",
+      "aliases": [
+        "Barbell biceps",
+        "Bicep curls barbell",
+        "Work barbell bicep curls",
+        "Work barbell biceps",
+        "Work barbell biceps curl",
+        "Work barbell biceps curls",
+        "Work Barbell biceps curls",
+        "Work bicep curls barbell",
+        "Work Bicep curls barbell"
+      ],
+      "normalizedKeySample": "bicep curls barbell"
+    },
+    {
+      "canonical": "Barbell Row",
+      "aliases": [
+        "Row barbell"
+      ],
+      "normalizedKeySample": "row barbell"
+    },
+    {
+      "canonical": "Barbell Shoulder Press",
+      "aliases": [
+        "Shoulder press barbell",
+        "Work barbell shoulder press",
+        "Work shoulder press barbell"
+      ],
+      "normalizedKeySample": "shoulder press barbell"
+    },
+    {
+      "canonical": "Barbell Shrugs",
+      "aliases": [
+        "Pf trapezoid barbell",
+        "Work barbell trapezoid",
+        "Work trapezoid barbell"
+      ],
+      "normalizedKeySample": "trapezoid barbell"
+    },
+    {
+      "canonical": "Barbell Squats",
+      "aliases": [
+        "Work squats with barbell"
+      ],
+      "normalizedKeySample": "squats with barbell"
+    },
+    {
+      "canonical": "Bench Press",
+      "aliases": [
+        "Bench press",
+        "GWork bench press",
+        "Pf bench press",
+        "PF bench press",
+        "Work bench press",
+        "Work Bench press",
+        "Work bench press."
+      ],
+      "normalizedKeySample": "bench press"
+    },
+    {
+      "canonical": "Bicep Curls",
+      "aliases": [
+        "Bicep curls",
+        "Biceps",
+        "Pf bicep curls",
+        "Work bicep curls"
+      ],
+      "normalizedKeySample": "bicep curls"
+    },
+    {
+      "canonical": "Biceps Curl Machine",
+      "aliases": [
+        "Biceps machine",
+        "Pf biceps curl machine",
+        "Pf biceps curls machine"
+      ],
+      "normalizedKeySample": "biceps curls machine"
+    },
+    {
+      "canonical": "Bodyweight Squats",
+      "aliases": [
+        "Body weight squats"
+      ],
+      "normalizedKeySample": "body weight squats"
+    },
+    {
+      "canonical": "Cable Bicep Curls",
+      "aliases": [
+        "Work bicep curls on dual adjustable pulley"
+      ],
+      "normalizedKeySample": "bicep curls on dual adjustable pulley"
+    },
+    {
+      "canonical": "Cable Fly",
+      "aliases": [
+        "Butterfly chest dual adjustable pulley"
+      ],
+      "normalizedKeySample": "butterfly chest dual adjustable pulley"
+    },
+    {
+      "canonical": "Calf Raise Machine",
+      "aliases": [
+        "Pf Calf extension"
+      ],
+      "normalizedKeySample": "calf extension"
+    },
+    {
+      "canonical": "Chest",
+      "aliases": [
+        "Pf chest",
+        "Pf chest 3 sets"
+      ],
+      "normalizedKeySample": "chest"
+    },
+    {
+      "canonical": "Chest Press",
+      "aliases": [
+        "Pf chest press",
+        "Pf Chest press"
+      ],
+      "normalizedKeySample": "chest press"
+    },
+    {
+      "canonical": "Deadlift",
+      "aliases": [
+        "Deadlift",
+        "Pf deadlift",
+        "Work deadlift",
+        "Work deadlift (3 sets)"
+      ],
+      "normalizedKeySample": "deadlift"
+    },
+    {
+      "canonical": "Dips",
+      "aliases": [
+        "Home dips",
+        "Work dips"
+      ],
+      "normalizedKeySample": "dips"
+    },
+    {
+      "canonical": "Dumbbell Back",
+      "aliases": [
+        "Back dumbbell",
+        "Back dumbbell bench",
+        "Back dumbbells",
+        "Back dummbell",
+        "Back horizontal machine",
+        "Barbell row (back)",
+        "Dumbbell back",
+        "Dumbbell Back",
+        "Dumbbell back one arm",
+        "One arm dumbbell back",
+        "Pf back",
+        "Work back",
+        "Work back one arm dumbbell",
+        "Work back one armed dumbbell",
+        "Work dumbbell back",
+        "Work inclined back one arm dumbbell",
+        "Work one arm back partial",
+        "Work one arm dumbbell back"
+      ],
+      "normalizedKeySample": "back dumbbells"
+    },
+    {
+      "canonical": "Dumbbell Bicep Curls",
+      "aliases": [
+        "Bicep curls dumbbells",
+        "Dumbbell biceps curls"
+      ],
+      "normalizedKeySample": "bicep curls dumbbells"
+    },
+    {
+      "canonical": "Dumbbell Chest Press",
+      "aliases": [
+        "Dumbbell chest"
+      ],
+      "normalizedKeySample": "dumbbell chest"
+    },
+    {
+      "canonical": "Dumbbell Deadlift",
+      "aliases": [
+        "dumbbell deadlift",
+        "Dumbbell deadlift",
+        "Pf deadlift dumbbell",
+        "Pf dumbbell deadlift",
+        "Work deadlift dumbbell",
+        "Work dumbbell deadlift"
+      ],
+      "normalizedKeySample": "dumbbell deadlift"
+    },
+    {
+      "canonical": "Dumbbell Shoulder Press",
+      "aliases": [
+        "Dumbbell shoulder press",
+        "Shoulder press dumbbell",
+        "Work shoulder press dumbbell",
+        "Work shoulders dumbbell"
+      ],
+      "normalizedKeySample": "shoulder press dumbbell"
+    },
+    {
+      "canonical": "Dumbbell Shrugs",
+      "aliases": [
+        "Dumbbell shrugs",
+        "Pf dumbbell trapezoid"
+      ],
+      "normalizedKeySample": "dumbbell shrugs"
+    },
+    {
+      "canonical": "Dumbbell Squats",
+      "aliases": [
+        "Squats dumbbell"
+      ],
+      "normalizedKeySample": "squats dumbbell"
+    },
+    {
+      "canonical": "Front Squats",
+      "aliases": [
+        "Work front squats"
+      ],
+      "normalizedKeySample": "front squats"
+    },
+    {
+      "canonical": "Incline Bench Press",
+      "aliases": [
+        "Inclined bench",
+        "Work inclined bench chest"
+      ],
+      "normalizedKeySample": "inclined bench"
+    },
+    {
+      "canonical": "Incline Chest Press Machine",
+      "aliases": [
+        "Pf Chest Incline press machine"
+      ],
+      "normalizedKeySample": "chest incline press machine"
+    },
+    {
+      "canonical": "Incline Dumbbell Bench Press",
+      "aliases": [
+        "Dumbbell inclined press",
+        "Inclined bench dumbbell",
+        "Inclined bench press dumbbells",
+        "Inclined dumbbell chest press",
+        "Inclined dumbbell press",
+        "Work incline bench dumbbell press",
+        "Work inclined bench dumbbell"
+      ],
+      "normalizedKeySample": "inclined dumbbell press"
+    },
+    {
+      "canonical": "Incline Smith Machine Bench Press",
+      "aliases": [
+        "Inclined bench press smith machine"
+      ],
+      "normalizedKeySample": "inclined bench press smith machine"
+    },
+    {
+      "canonical": "Leg Curl",
+      "aliases": [
+        "Pf leg curl"
+      ],
+      "normalizedKeySample": "leg curl"
+    },
+    {
+      "canonical": "Leg Press",
+      "aliases": [
+        "Pf leg press",
+        "Pf Leg press"
+      ],
+      "normalizedKeySample": "leg press"
+    },
+    {
+      "canonical": "Leg Raises",
+      "aliases": [
+        "Leg abs",
+        "Pf leg raise abs"
+      ],
+      "normalizedKeySample": "leg raise abs"
+    },
+    {
+      "canonical": "Lower Abs",
+      "aliases": [
+        "Lower abs",
+        "Pf lower abs"
+      ],
+      "normalizedKeySample": "lower abs"
+    },
+    {
+      "canonical": "One-Arm Dumbbell Bench Press",
+      "aliases": [
+        "Work one arm dumbell bench"
+      ],
+      "normalizedKeySample": "one arm dumbell bench"
+    },
+    {
+      "canonical": "One-Arm Dumbbell Row",
+      "aliases": [
+        "One arm dumbbell",
+        "Work one-arm dumbbell row on bench"
+      ],
+      "normalizedKeySample": "one arm dumbbell"
+    },
+    {
+      "canonical": "Pull Ups",
+      "aliases": [
+        "Pull ups",
+        "Work 10 pullups",
+        "Work pull ups",
+        "Work pullups"
+      ],
+      "normalizedKeySample": "pull ups"
+    },
+    {
+      "canonical": "Push Ups",
+      "aliases": [
+        "Push ups at home"
+      ],
+      "normalizedKeySample": "push ups at home"
+    },
+    {
+      "canonical": "Quads Machine",
+      "aliases": [
+        "Pf Quads machine"
+      ],
+      "normalizedKeySample": "quads machine"
+    },
+    {
+      "canonical": "Row",
+      "aliases": [
+        "Row"
+      ],
+      "normalizedKeySample": "row"
+    },
+    {
+      "canonical": "Run",
+      "aliases": [
+        "Run",
+        "Run 10k"
+      ],
+      "normalizedKeySample": "run"
+    },
+    {
+      "canonical": "Seated Leg Curl",
+      "aliases": [
+        "Pf seated leg curl"
+      ],
+      "normalizedKeySample": "seated leg curl"
+    },
+    {
+      "canonical": "Seated Leg Press",
+      "aliases": [
+        "Pf seated leg press",
+        "Pf Seated leg press"
+      ],
+      "normalizedKeySample": "seated leg press"
+    },
+    {
+      "canonical": "Shoukder Press Barbell",
+      "aliases": [
+        "Work Shoukder press barbell"
+      ],
+      "normalizedKeySample": "shoukder press barbell"
+    },
+    {
+      "canonical": "Shoulder Dumbbell",
+      "aliases": [
+        "Work shoulder dumbbell"
+      ],
+      "normalizedKeySample": "shoulder dumbbell"
+    },
+    {
+      "canonical": "Shoulder Press",
+      "aliases": [
+        "Pf shoulder",
+        "Pf shoulder press",
+        "Shoulder press",
+        "Work shoulder press",
+        "Work Shoulder press"
+      ],
+      "normalizedKeySample": "shoulder press"
+    },
+    {
+      "canonical": "Shoulder Press Machine",
+      "aliases": [
+        "Pf shoulder press machine"
+      ],
+      "normalizedKeySample": "shoulder press machine"
+    },
+    {
+      "canonical": "Something",
+      "aliases": [
+        "Work something"
+      ],
+      "normalizedKeySample": "something"
+    },
+    {
+      "canonical": "Squat",
+      "aliases": [
+        "Pf squat",
+        "Work squat"
+      ],
+      "normalizedKeySample": "squat"
+    },
+    {
+      "canonical": "Squats",
+      "aliases": [
+        "Squats",
+        "Work squats"
+      ],
+      "normalizedKeySample": "squats"
+    },
+    {
+      "canonical": "Trapezoid Dumbbell",
+      "aliases": [
+        "Pf trapezoid dumbbell"
+      ],
+      "normalizedKeySample": "trapezoid dumbbell"
+    },
+    {
+      "canonical": "Triceps",
+      "aliases": [
+        "Pf triceps",
+        "Triceps",
+        "Work triceps"
+      ],
+      "normalizedKeySample": "triceps"
+    },
+    {
+      "canonical": "Triceps Machine",
+      "aliases": [
+        "Machine triceps",
+        "Triceps machine"
+      ],
+      "normalizedKeySample": "triceps machine"
+    },
+    {
+      "canonical": "Triceps Rope Pushdown",
+      "aliases": [
+        "Work triceps rope"
+      ],
+      "normalizedKeySample": "triceps rope"
+    },
+    {
+      "canonical": "Wrist Curls",
+      "aliases": [
+        "Work wrist curls"
+      ],
+      "normalizedKeySample": "wrist curls"
+    }
+  ]
+}

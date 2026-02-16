@@ -1,41 +1,34 @@
 import {
   BatchWriteCommand,
-  QueryCommand,
-  type QueryCommandInput,
+  ScanCommand,
+  type ScanCommandInput,
 } from "@aws-sdk/lib-dynamodb";
 import { docClient, tables } from "../lib/dynamo";
-
-const USER_ID = process.env.USER_ID || "me";
 
 async function run() {
   let lastEvaluatedKey: Record<string, unknown> | undefined;
   let deleted = 0;
 
   do {
-    const input: QueryCommandInput = {
-      TableName: tables.sessionsV1,
-      KeyConditionExpression: "userId = :userId",
-      ExpressionAttributeValues: {
-        ":userId": USER_ID,
-      },
-      ProjectionExpression: "userId, sessionDate",
+    const input: ScanCommandInput = {
+      TableName: tables.exercises,
+      ProjectionExpression: "exerciseId",
       ExclusiveStartKey: lastEvaluatedKey,
     };
 
-    const out = await docClient.send(new QueryCommand(input));
+    const out = await docClient.send(new ScanCommand(input));
     lastEvaluatedKey = out.LastEvaluatedKey as Record<string, unknown> | undefined;
 
-    const items = (out.Items || []) as Array<{ userId: string; sessionDate: string }>;
+    const items = (out.Items || []) as Array<{ exerciseId: string }>;
     for (let i = 0; i < items.length; i += 25) {
       const chunk = items.slice(i, i + 25);
       await docClient.send(
         new BatchWriteCommand({
           RequestItems: {
-            [tables.sessionsV1]: chunk.map((item) => ({
+            [tables.exercises]: chunk.map((item) => ({
               DeleteRequest: {
                 Key: {
-                  userId: item.userId,
-                  sessionDate: item.sessionDate,
+                  exerciseId: item.exerciseId,
                 },
               },
             })),
@@ -46,7 +39,7 @@ async function run() {
     }
   } while (lastEvaluatedKey);
 
-  console.log(`Deleted ${deleted} legacy sessions for userId=${USER_ID}.`);
+  console.log(`Deleted ${deleted} exercises from ${tables.exercises}.`);
 }
 
 run().catch((err) => {
