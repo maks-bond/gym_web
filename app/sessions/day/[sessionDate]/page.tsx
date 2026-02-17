@@ -29,13 +29,13 @@ export default async function SessionDayPage({ params }: Props) {
       </div>
 
       {sessions.map((session, idx) => (
-        <article key={`${session.userId}-${session.sessionDate}-${idx}`} className="card">
+        <article key={`${session.userId}-${session.sessionId}`} className="card">
           <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
             <h3>
               Session {idx + 1} <span style={{ color: "#4b5563" }}>({session.locationName})</span>
             </h3>
             <Link
-              href={`/sessions/${session.sessionDate}/edit`}
+              href={`/sessions/${session.sessionId}/edit`}
               className="button button-link button-small"
             >
               Edit

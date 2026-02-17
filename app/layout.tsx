@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Gym Log",
+  title: "Maksym Gym",
   description: "Track your gym sessions",
 };
 
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <main className="container">
           <header className="header">
-            <h1>Gym Log</h1>
+            <h1>Maksym Gym</h1>
             <nav className="nav">
               <Link href="/" className="nav-icon" title="Sessions" aria-label="Sessions">
                 <svg viewBox="0 0 24 24" aria-hidden="true">

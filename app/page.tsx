@@ -13,13 +13,13 @@ export default async function HomePage() {
       <SessionsCalendar sessionDates={sessions.map((x) => x.sessionDate)} />
       {sessions.length === 0 ? <p>No sessions yet.</p> : null}
       {sessions.map((session) => (
-        <article key={`${session.userId}-${session.sessionDate}`} className="card">
+        <article key={`${session.userId}-${session.sessionId}`} className="card">
           <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
             <h3>
               {session.sessionDate} <span style={{ color: "#4b5563" }}>({session.locationName})</span>
             </h3>
             <Link
-              href={`/sessions/${session.sessionDate}/edit`}
+              href={`/sessions/${session.sessionId}/edit`}
               className="button button-link button-small"
             >
               Edit

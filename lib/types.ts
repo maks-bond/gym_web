@@ -33,7 +33,11 @@ export type SessionExerciseItem = {
 
 export type GymSessionV2 = {
   userId: string;
+  sessionId: string;
   sessionDate: string;
+  sessionSortKey: string;
+  startTime?: string;
+  endTime?: string;
   locationId: string;
   exerciseItems: SessionExerciseItem[];
   notesRaw?: string;
@@ -43,7 +47,10 @@ export type GymSessionV2 = {
 
 export type GymSessionView = {
   userId: string;
+  sessionId: string;
   sessionDate: string;
+  startTime?: string;
+  endTime?: string;
   locationId: string;
   locationName: string;
   exerciseItems: Array<{

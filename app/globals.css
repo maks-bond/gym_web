@@ -219,7 +219,19 @@ body {
 
 .calendar-cell-button:hover:not(:disabled) {
   border-color: var(--line-strong);
-  background: #f5f6f7;
+  background: #e0e3e8;
+}
+
+.calendar-cell-button:active:not(:disabled) {
+  border-color: #8f96a0;
+  background: #c7ccd4;
+}
+
+.calendar-cell-button:focus-visible {
+  outline: 2px solid #8f96a0;
+  outline-offset: 1px;
+  border-color: #8f96a0;
+  background: #d5dae2;
 }
 
 .calendar-cell.is-empty {

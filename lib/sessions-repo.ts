@@ -22,6 +22,15 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+function newSessionId(): string {
+  return `s-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function sessionSortValue(sessionDate: string, startTime?: string): string {
+  const time = startTime?.trim() || "00:00";
+  return `${sessionDate}T${time}`;
+}
+
 function uniq<T>(items: T[]): T[] {
   return [...new Set(items)];
 }
@@ -323,16 +332,24 @@ export async function ensureExercise(input: {
 
 export async function upsertSessionV2(input: {
   userId: string;
+  sessionId?: string;
   sessionDate: string;
+  startTime?: string;
+  endTime?: string;
   locationId: string;
   exerciseItems: SessionExerciseItem[];
   notesRaw?: string;
 }): Promise<GymSessionV2> {
   const now = nowIso();
+  const sessionId = input.sessionId?.trim() || newSessionId();
 
   const item: GymSessionV2 = {
     userId: input.userId,
+    sessionId,
     sessionDate: input.sessionDate,
+    sessionSortKey: sessionSortValue(input.sessionDate, input.startTime),
+    startTime: input.startTime?.trim() || undefined,
+    endTime: input.endTime?.trim() || undefined,
     locationId: input.locationId,
     exerciseItems: input.exerciseItems,
     notesRaw: input.notesRaw,
@@ -360,7 +377,7 @@ export async function clearSessionsV2(userId: string): Promise<number> {
         TableName: tables.sessionsV2,
         Key: {
           userId: session.userId,
-          sessionDate: session.sessionDate,
+          sessionId: session.sessionId,
         },
       }),
     );
@@ -382,7 +399,14 @@ export async function listRawSessionsV2(userId: string): Promise<GymSessionV2[]>
     }),
   );
 
-  return ((out.Items || []) as GymSessionV2[]).filter((x) => !(x as { _deleted?: boolean })._deleted);
+  return ((out.Items || []) as GymSessionV2[])
+    .filter((x) => !(x as { _deleted?: boolean })._deleted)
+    .sort((a, b) => {
+      if (a.sessionSortKey !== b.sessionSortKey) {
+        return a.sessionSortKey < b.sessionSortKey ? 1 : -1;
+      }
+      return a.sessionId < b.sessionId ? 1 : -1;
+    });
 }
 
 export async function listSessions(userId: string): Promise<GymSessionView[]> {
@@ -406,13 +430,29 @@ export async function listSessions(userId: string): Promise<GymSessionView[]> {
 }
 
 export async function getSession(userId: string, sessionDate: string): Promise<GymSessionView | null> {
+  const session = await getSessionByDate(userId, sessionDate);
+  return session;
+}
+
+export async function getSessionByDate(
+  userId: string,
+  sessionDate: string,
+): Promise<GymSessionView | null> {
+  const sessions = await listSessionsByDate(userId, sessionDate);
+  return sessions[0] || null;
+}
+
+export async function getSessionById(
+  userId: string,
+  sessionId: string,
+): Promise<GymSessionView | null> {
   const out = await docClient.send(
     new QueryCommand({
       TableName: tables.sessionsV2,
-      KeyConditionExpression: "userId = :userId and sessionDate = :sessionDate",
+      KeyConditionExpression: "userId = :userId and sessionId = :sessionId",
       ExpressionAttributeValues: {
         ":userId": userId,
-        ":sessionDate": sessionDate,
+        ":sessionId": sessionId,
       },
       Limit: 1,
     }),
@@ -460,7 +500,7 @@ export async function createBackup(userId: string): Promise<Omit<BackupRecord, "
     userId,
     backupId,
     createdAt: snapshot.exportedAt,
-    schemaVersion: 2,
+    schemaVersion: 3,
     summary: {
       sessionsV1: sessionsV1.length,
       sessionsV2: sessionsV2.length,
@@ -524,4 +564,12 @@ export async function getBackup(
 
   const { payload, ...meta } = item;
   return { meta, snapshot: JSON.parse(payload) as BackupSnapshot };
+}
+
+export async function listSessionsByDate(
+  userId: string,
+  sessionDate: string,
+): Promise<GymSessionView[]> {
+  const all = await listSessions(userId);
+  return all.filter((x) => x.sessionDate === sessionDate);
 }

@@ -17,6 +17,7 @@
     "seed-locations": "tsx scripts/seed-locations.ts",
     "review-exercises": "tsx scripts/review-exercises.ts",
     "migrate-v1-to-v2": "tsx scripts/migrate-v1-to-v2.ts",
+    "migrate-sessions-v2-to-v3": "tsx scripts/migrate-sessions-v2-to-v3.ts",
     "rank-exercises": "tsx scripts/rank-exercises.ts",
     "backup-now": "tsx scripts/backup-now.ts",
     "list-backups": "tsx scripts/list-backups.ts",

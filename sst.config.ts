@@ -31,6 +31,17 @@ export default $config({
       },
     });
 
+    const sessionsV3Table = new sst.aws.Dynamo("SessionsV3", {
+      fields: {
+        userId: "string",
+        sessionId: "string",
+      },
+      primaryIndex: {
+        hashKey: "userId",
+        rangeKey: "sessionId",
+      },
+    });
+
     const exercisesTable = new sst.aws.Dynamo("Exercises", {
       fields: {
         exerciseId: "string",
@@ -62,10 +73,18 @@ export default $config({
 
     const web = new sst.aws.Nextjs("Web", {
       path: ".",
-      link: [sessionsV1Table, sessionsV2Table, exercisesTable, locationsTable, backupsTable],
+      link: [
+        sessionsV1Table,
+        sessionsV2Table,
+        sessionsV3Table,
+        exercisesTable,
+        locationsTable,
+        backupsTable,
+      ],
       environment: {
         DDB_TABLE_SESSIONS_V1: sessionsV1Table.name,
-        DDB_TABLE_SESSIONS: sessionsV2Table.name,
+        DDB_TABLE_SESSIONS_V2: sessionsV2Table.name,
+        DDB_TABLE_SESSIONS: sessionsV3Table.name,
         DDB_TABLE_EXERCISES: exercisesTable.name,
         DDB_TABLE_LOCATIONS: locationsTable.name,
         DDB_TABLE_BACKUPS: backupsTable.name,
@@ -75,7 +94,8 @@ export default $config({
     return {
       url: web.url,
       sessionsV1TableName: sessionsV1Table.name,
-      sessionsTableName: sessionsV2Table.name,
+      sessionsV2TableName: sessionsV2Table.name,
+      sessionsTableName: sessionsV3Table.name,
       exercisesTableName: exercisesTable.name,
       locationsTableName: locationsTable.name,
       backupsTableName: backupsTable.name,

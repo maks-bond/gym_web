@@ -1,10 +1,10 @@
 # gym_web
 
-Gym tracker web app (`Gym Log`) built with Next.js + DynamoDB and deployed with SST on AWS.
+Gym tracker web app (`Maksym Gym`) built with Next.js + DynamoDB and deployed with SST on AWS.
 
 ## Live App
 
-- Website name: `Gym Log`
+- Website name: `Maksym Gym`
 - Public URL: `https://del583hszwti1.cloudfront.net`
 - AWS region: `us-east-2`
 - Stage: `maksym`
@@ -61,9 +61,12 @@ Important SST outputs:
 - Legacy sessions table (`DDB_TABLE_SESSIONS_V1`)
   - PK: `userId` (string), SK: `sessionDate` (YYYY-MM-DD)
   - Stores imported/legacy exercise strings
-- Normalized sessions table (`DDB_TABLE_SESSIONS`)
+- Normalized sessions table (`DDB_TABLE_SESSIONS`, v3)
+  - PK: `userId`, SK: `sessionId`
+  - Stores `sessionDate`, optional `startTime`/`endTime`, `locationId`, and `exerciseItems[]`
+- Previous normalized sessions table (`DDB_TABLE_SESSIONS_V2`, legacy)
   - PK: `userId`, SK: `sessionDate`
-  - Stores `locationId` and `exerciseItems[]` (exercise IDs)
+  - Kept for migration/reference
 - Exercises table (`DDB_TABLE_EXERCISES`)
   - PK: `exerciseId`
   - Stores canonical exercise catalog (`name`, `aliases`, usage/order metadata)
@@ -78,7 +81,7 @@ Important SST outputs:
 
 - `/` sessions list + monthly training calendar + session edit links
 - `/new` create a new session
-- `/sessions/[sessionDate]/edit` edit an existing session
+- `/sessions/[sessionId]/edit` edit an existing session
 - `/exercises` list and edit exercise catalog
 - `/exercises/new` hidden page to create a new exercise
 
@@ -88,10 +91,12 @@ Important SST outputs:
   - list all normalized sessions
 - `GET /api/sessions?sessionDate=YYYY-MM-DD`
   - get one session
+- `GET /api/sessions?sessionId=<id>`
+  - get one session by id
 - `POST /api/sessions`
-  - create/upsert session (by `sessionDate`)
+  - create session (supports optional `startTime`/`endTime` in `HH:mm`)
 - `PUT /api/sessions`
-  - update/upsert session (by `sessionDate`)
+  - update session (pass `sessionId`; supports `startTime`/`endTime`)
 - `GET /api/exercises?q=...&limit=...`
   - list exercises (supports text filter)
 - `POST /api/exercises`
@@ -152,6 +157,9 @@ Normalize into v2:
 npm run seed-locations
 npm run review-exercises
 npm run migrate-v1-to-v2
+export DDB_TABLE_SESSIONS_V2=<old sessions table>
+export DDB_TABLE_SESSIONS=<new sessions table>
+npm run migrate-sessions-v2-to-v3
 npm run rank-exercises
 LIMIT=40 npm run list-sessions
 ```
@@ -166,6 +174,14 @@ LIMIT=40 npm run list-sessions
 - `npm run clear-sessions` clear legacy sessions
 - `npm run clear-exercises` clear exercise catalog
 - `npm run seed-locations` seed locations table
+- `npm run migrate-sessions-v2-to-v3` copy old normalized sessions into v3 schema
+
+## Time Fields
+
+- Session schema now supports optional:
+  - `startTime` (`HH:mm`)
+  - `endTime` (`HH:mm`)
+- UI input for these can be added later; API and DB schema are ready.
 - `npm run deploy` deploy/update AWS resources
 - `npm run remove` remove stage resources (non-production stages are configured as removable)
 

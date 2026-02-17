@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSession, listLocations, listSessions, upsertSessionV2 } from "@/lib/sessions-repo";
+import {
+  getSessionByDate,
+  getSessionById,
+  listLocations,
+  listSessions,
+  upsertSessionV2,
+} from "@/lib/sessions-repo";
 
 const USER_ID = "me";
 
@@ -7,13 +13,23 @@ function isIsoDate(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+function isIsoTime(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
 function parseAndValidate(body: {
+  sessionId?: string;
   sessionDate?: string;
+  startTime?: string;
+  endTime?: string;
   locationId?: string;
   exerciseIds?: string[];
   notesRaw?: string;
 }) {
+  const sessionId = (body.sessionId || "").trim();
   const sessionDate = (body.sessionDate || "").trim();
+  const startTime = (body.startTime || "").trim();
+  const endTime = (body.endTime || "").trim();
   const locationId = (body.locationId || "unknown").trim();
   const exerciseIds = (body.exerciseIds || []).map((x) => x.trim()).filter(Boolean);
 
@@ -25,13 +41,37 @@ function parseAndValidate(body: {
     return { error: "At least one exercise is required" };
   }
 
-  return { sessionDate, locationId, exerciseIds, notesRaw: body.notesRaw };
+  if (startTime && !isIsoTime(startTime)) {
+    return { error: "startTime must be HH:mm" };
+  }
+  if (endTime && !isIsoTime(endTime)) {
+    return { error: "endTime must be HH:mm" };
+  }
+
+  return {
+    sessionId,
+    sessionDate,
+    startTime: startTime || undefined,
+    endTime: endTime || undefined,
+    locationId,
+    exerciseIds,
+    notesRaw: body.notesRaw,
+  };
 }
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+    const sessionId = (url.searchParams.get("sessionId") || "").trim();
     const sessionDate = (url.searchParams.get("sessionDate") || "").trim();
+
+    if (sessionId) {
+      const session = await getSessionById(USER_ID, sessionId);
+      if (!session) {
+        return NextResponse.json({ error: "Session not found" }, { status: 404 });
+      }
+      return NextResponse.json({ session });
+    }
 
     if (sessionDate) {
       if (!isIsoDate(sessionDate)) {
@@ -41,7 +81,7 @@ export async function GET(req: Request) {
         );
       }
 
-      const session = await getSession(USER_ID, sessionDate);
+      const session = await getSessionByDate(USER_ID, sessionDate);
       if (!session) {
         return NextResponse.json({ error: "Session not found" }, { status: 404 });
       }
@@ -59,7 +99,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const parsed = parseAndValidate((await req.json()) as {
+      sessionId?: string;
       sessionDate?: string;
+      startTime?: string;
+      endTime?: string;
       locationId?: string;
       exerciseIds?: string[];
       notesRaw?: string;
@@ -79,7 +122,10 @@ export async function POST(req: Request) {
 
     const session = await upsertSessionV2({
       userId: USER_ID,
+      sessionId: parsed.sessionId || undefined,
       sessionDate: parsed.sessionDate,
+      startTime: parsed.startTime,
+      endTime: parsed.endTime,
       locationId: parsed.locationId,
       exerciseItems: parsed.exerciseIds.map((exerciseId) => ({ exerciseId })),
       notesRaw: parsed.notesRaw,
@@ -95,7 +141,10 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const parsed = parseAndValidate((await req.json()) as {
+      sessionId?: string;
       sessionDate?: string;
+      startTime?: string;
+      endTime?: string;
       locationId?: string;
       exerciseIds?: string[];
       notesRaw?: string;
@@ -115,7 +164,10 @@ export async function PUT(req: Request) {
 
     const session = await upsertSessionV2({
       userId: USER_ID,
+      sessionId: parsed.sessionId || undefined,
       sessionDate: parsed.sessionDate,
+      startTime: parsed.startTime,
+      endTime: parsed.endTime,
       locationId: parsed.locationId,
       exerciseItems: parsed.exerciseIds.map((exerciseId) => ({ exerciseId })),
       notesRaw: parsed.notesRaw,

@@ -6,7 +6,10 @@ import { useParams, useRouter } from "next/navigation";
 type Exercise = { exerciseId: string; name: string; usageCount?: number };
 type Location = { locationId: string; name: string };
 type SessionPayload = {
+  sessionId: string;
   sessionDate: string;
+  startTime?: string;
+  endTime?: string;
   locationId: string;
   exerciseItems: Array<{ exerciseId: string; name?: string }>;
 };
@@ -14,7 +17,8 @@ type SessionPayload = {
 export default function EditSessionPage() {
   const router = useRouter();
   const params = useParams<{ sessionDate: string }>();
-  const sessionDate = Array.isArray(params.sessionDate) ? params.sessionDate[0] : params.sessionDate;
+  const sessionId = Array.isArray(params.sessionDate) ? params.sessionDate[0] : params.sessionDate;
+  const [sessionDate, setSessionDate] = useState("");
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationId, setLocationId] = useState("unknown");
@@ -28,12 +32,12 @@ export default function EditSessionPage() {
 
   useEffect(() => {
     async function loadData() {
-      if (!sessionDate) return;
+      if (!sessionId) return;
 
       const [locationsRes, exercisesRes, sessionRes] = await Promise.all([
         fetch("/api/locations"),
         fetch("/api/exercises?limit=500"),
-        fetch(`/api/sessions?sessionDate=${encodeURIComponent(sessionDate)}`),
+        fetch(`/api/sessions?sessionId=${encodeURIComponent(sessionId)}`),
       ]);
 
       const locationsPayload = await locationsRes.json();
@@ -50,6 +54,7 @@ export default function EditSessionPage() {
 
       setLocations(loadedLocations);
       setLibrary(loadedExercises);
+      setSessionDate(session.sessionDate);
       setLocationId(session.locationId || "unknown");
 
       const byId = new Map(loadedExercises.map((x) => [x.exerciseId, x]));
@@ -64,7 +69,7 @@ export default function EditSessionPage() {
     loadData()
       .catch((err) => setError(err instanceof Error ? err.message : "Unknown error"))
       .finally(() => setIsLoading(false));
-  }, [sessionDate]);
+  }, [sessionId]);
 
   const selectedIds = useMemo(() => new Set(selected.map((x) => x.exerciseId)), [selected]);
   const filtered = useMemo(() => {
@@ -84,7 +89,7 @@ export default function EditSessionPage() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!sessionDate) return;
+    if (!sessionId || !sessionDate) return;
 
     setIsSaving(true);
     setError(null);
@@ -94,6 +99,7 @@ export default function EditSessionPage() {
         method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
+          sessionId,
           sessionDate,
           locationId,
           exerciseIds: selected.map((x) => x.exerciseId),

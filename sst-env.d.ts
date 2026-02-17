@@ -26,6 +26,10 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Dynamo"
     }
+    "SessionsV3": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "Web": {
       "type": "sst.aws.Nextjs"
       "url": string

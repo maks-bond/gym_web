@@ -38,6 +38,7 @@ async function run() {
 
     await upsertSessionV2({
       userId: USER_ID,
+      sessionId: `legacy-${session.sessionDate}`,
       sessionDate: session.sessionDate,
       locationId,
       exerciseItems: exerciseIds.map((exerciseId) => ({ exerciseId })),

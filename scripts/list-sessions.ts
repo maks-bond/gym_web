@@ -7,11 +7,13 @@ async function run() {
   const sessions = await listSessions(USER_ID);
   const subset = sessions.slice(0, LIMIT);
 
-  console.log(`Total sessions (v2): ${sessions.length}`);
+  console.log(`Total sessions: ${sessions.length}`);
   console.log(`Showing newest ${subset.length} sessions:`);
 
   for (const session of subset) {
-    console.log(`\n${session.sessionDate} [${session.locationName}]`);
+    console.log(
+      `\n${session.sessionDate} ${session.startTime || "--:--"}-${session.endTime || "--:--"} [${session.locationName}] (${session.sessionId})`,
+    );
     for (const exercise of session.exerciseItems) {
       console.log(`- ${exercise.name}`);
     }
