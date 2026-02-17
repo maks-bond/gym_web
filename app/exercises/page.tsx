@@ -12,6 +12,9 @@ type Exercise = {
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [newName, setNewName] = useState("");
+  const [newAliases, setNewAliases] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editAliases, setEditAliases] = useState("");
@@ -47,6 +50,40 @@ export default function ExercisesPage() {
     setEditName("");
     setEditAliases("");
     setIsSaving(false);
+  }
+
+  async function createNewExercise(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsCreating(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/exercises", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: newName,
+          aliases: newAliases
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean),
+        }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to create exercise");
+      }
+
+      const created = payload.exercise as Exercise;
+      setExercises((prev) => [created, ...prev.filter((x) => x.exerciseId !== created.exerciseId)]);
+      setNewName("");
+      setNewAliases("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setIsCreating(false);
+    }
   }
 
   async function saveEdit(event: FormEvent<HTMLFormElement>) {
@@ -89,6 +126,36 @@ export default function ExercisesPage() {
     <section>
       <h2>Exercises</h2>
       <p className="helper">Sorted by your configured frequency order.</p>
+
+      <form className="card" onSubmit={createNewExercise}>
+        <h3 style={{ marginTop: 0 }}>Add Exercise</h3>
+        <div className="row">
+          <label htmlFor="new-exercise-name">Name</label>
+          <input
+            id="new-exercise-name"
+            className="input"
+            required
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="e.g. Romanian Deadlift"
+          />
+        </div>
+        <div className="row" style={{ marginTop: 8 }}>
+          <label htmlFor="new-exercise-aliases">Aliases (comma-separated)</label>
+          <input
+            id="new-exercise-aliases"
+            className="input"
+            value={newAliases}
+            onChange={(e) => setNewAliases(e.target.value)}
+            placeholder="e.g. RDL"
+          />
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <button className="button" type="submit" disabled={isCreating}>
+            {isCreating ? "Adding..." : "Add"}
+          </button>
+        </div>
+      </form>
 
       <div className="card">
         {exercises.map((exercise) => (
