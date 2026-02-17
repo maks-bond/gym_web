@@ -5,7 +5,8 @@ Gym tracker web app (`Maksym Gym`) built with Next.js + DynamoDB and deployed wi
 ## Live App
 
 - Website name: `Maksym Gym`
-- Public URL: `https://del583hszwti1.cloudfront.net`
+- Public URL: `https://gym-maksym.pages.dev/`
+- Origin URL (AWS): `https://del583hszwti1.cloudfront.net`
 - AWS region: `us-east-2`
 - Stage: `maksym`
 
@@ -194,3 +195,24 @@ When returning later:
 3. `npm run dev` for local work, or `npm run deploy` for cloud updates.
 4. Verify table names from latest deploy output.
 5. Run `npm run backup-now` before major data/schema changes.
+
+## Cloudflare Pages Redirect (Free URL)
+
+This repo includes a ready redirect site in `pages-redirect/` for a free `*.pages.dev` URL.
+
+- Source folder: `pages-redirect`
+- Redirect target: `https://del583hszwti1.cloudfront.net`
+- Rule file: `pages-redirect/_redirects`
+- Active Pages URL: `https://gym-maksym.pages.dev/`
+- Note: this app is connected to your Cloudflare account via a Pages project.
+- To rename the public `*.pages.dev` URL, go to Cloudflare Dashboard -> Workers & Pages -> your project -> Settings -> General -> Project name / Domains.
+
+Quick setup in Cloudflare:
+
+1. Cloudflare Dashboard -> Pages -> Create project.
+2. Choose `Direct Upload` (or connect this repo).
+3. Upload contents of `pages-redirect/`.
+4. Pick your subdomain, for example `maksym-gym.pages.dev`.
+5. Deploy.
+
+After deploy, all paths are redirected to the current app URL using a `302` redirect.
