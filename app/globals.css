@@ -44,6 +44,25 @@ body {
   letter-spacing: 0.01em;
 }
 
+.brand-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  color: var(--accent);
+}
+
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
 .nav {
   display: flex;
   gap: 10px;

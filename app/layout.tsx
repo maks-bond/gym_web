@@ -13,7 +13,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <main className="container">
           <header className="header">
-            <h1>Maksym Gym</h1>
+            <h1 className="brand-title">
+              <span className="brand-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 9h2v6H3zM6 8h2v8H6zM16 8h2v8h-2zM19 9h2v6h-2zM8 10h8v4H8z" />
+                </svg>
+              </span>
+              Maksym Gym
+            </h1>
             <nav className="nav">
               <Link href="/" className="nav-icon" title="Sessions" aria-label="Sessions">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -27,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
               <Link href="/exercises" className="nav-icon" title="Exercises" aria-label="Exercises">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 10h4v4H4zM16 10h4v4h-4zM8 11h8M8 13h8" />
+                  <path d="M3 10h2v4H3zM6 9h2v6H6zM8 11h8M16 9h2v6h-2zM19 10h2v4h-2z" />
                 </svg>
               </Link>
             </nav>
