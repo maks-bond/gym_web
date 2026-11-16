@@ -71,6 +71,8 @@ export default $config({
       },
     });
 
+    const backupsBucket = new sst.aws.Bucket("BackupsBucket");
+
     const web = new sst.aws.Nextjs("Web", {
       path: ".",
       link: [
@@ -80,6 +82,7 @@ export default $config({
         exercisesTable,
         locationsTable,
         backupsTable,
+        backupsBucket,
       ],
       environment: {
         DDB_TABLE_SESSIONS_V1: sessionsV1Table.name,
@@ -88,6 +91,7 @@ export default $config({
         DDB_TABLE_EXERCISES: exercisesTable.name,
         DDB_TABLE_LOCATIONS: locationsTable.name,
         DDB_TABLE_BACKUPS: backupsTable.name,
+        BACKUPS_BUCKET: backupsBucket.name,
       },
     });
 
@@ -99,6 +103,7 @@ export default $config({
       exercisesTableName: exercisesTable.name,
       locationsTableName: locationsTable.name,
       backupsTableName: backupsTable.name,
+      backupsBucketName: backupsBucket.name,
     };
   },
 });

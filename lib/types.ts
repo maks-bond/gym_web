@@ -83,5 +83,7 @@ export type BackupRecord = {
     exercises: number;
     locations: number;
   };
-  payload: string;
+  // Snapshot lives in S3 at s3Key; older backups stored it inline in payload.
+  s3Key?: string;
+  payload?: string;
 };

@@ -10,6 +10,10 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Dynamo"
     }
+    "BackupsBucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
     "Exercises": {
       "name": string
       "type": "sst.aws.Dynamo"

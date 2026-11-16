@@ -76,11 +76,13 @@ Important SST outputs:
   - Stores location catalog
 - Backups table (`DDB_TABLE_BACKUPS`)
   - PK: `userId`, SK: `backupId` (ISO timestamp)
-  - Stores snapshot payload + summary counts
+  - Stores summary counts + `s3Key`; the snapshot JSON lives in the S3 bucket (`BACKUPS_BUCKET`)
+  - Backups before 2026-11-16 store the snapshot inline in `payload` (still readable)
 
 ## Routes (Web)
 
-- `/` sessions list + monthly training calendar + session edit links
+- `/` "next up" suggestion (rotation detected from recent sessions), muscle groups not trained lately, sessions list + monthly calendar
+- `/new?from=<sessionId>` new session pre-filled with another session's exercises
 - `/new` create a new session
 - `/sessions/[sessionId]/edit` edit an existing session
 - `/exercises` list and edit exercise catalog
@@ -96,6 +98,7 @@ Important SST outputs:
   - get one session by id
 - `POST /api/sessions`
   - create session (supports optional `startTime`/`endTime` in `HH:mm`)
+  - body: `exerciseItems: [{ exerciseId, notes? }]` (legacy `exerciseIds: []` still accepted)
 - `PUT /api/sessions`
   - update session (pass `sessionId`; supports `startTime`/`endTime`)
 - `GET /api/exercises?q=...&limit=...`
@@ -104,6 +107,11 @@ Important SST outputs:
   - create exercise
 - `PUT /api/exercises`
   - edit exercise
+- `POST /api/exercises/rank`
+  - recount `usageCount` from all sessions and reorder (`sortOrder`); also the small "refresh" link on `/exercises`
+  - runs automatically after every session save
+- `GET /api/exercises/last-notes`
+  - latest per-exercise notes (shown as hints in the session form)
 - `GET /api/locations`
   - list locations
 - `POST /api/backup`
@@ -140,9 +148,12 @@ curl "https://del583hszwti1.cloudfront.net/api/backup?backupId=2026-02-16T12:34:
 CLI shortcuts (local):
 
 ```bash
+npm run backup-to-repo   # new server backup + write backups/gym-backup.json (no AWS creds needed), then commit it
 npm run backup-now
 npm run list-backups
 ```
+
+`backups/gym-backup.json` is overwritten each time; git history holds older versions.
 
 ## Import / Migration Flow
 

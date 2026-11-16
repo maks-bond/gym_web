@@ -1,9 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import ExercisePicker, {
+  type Exercise,
+  type SelectedExercise,
+  toExerciseItems,
+} from "../components/exercise-picker";
+import { todayIsoLocal } from "@/lib/date";
 
-type Exercise = { exerciseId: string; name: string; usageCount?: number };
 type Location = { locationId: string; name: string };
 
 export default function NewSessionPage() {
@@ -13,18 +18,15 @@ export default function NewSessionPage() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationId, setLocationId] = useState("unknown");
 
-  const [query, setQuery] = useState("");
   const [library, setLibrary] = useState<Exercise[]>([]);
-  const [selected, setSelected] = useState<Exercise[]>([]);
+  const [selected, setSelected] = useState<SelectedExercise[]>([]);
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const date = new URLSearchParams(window.location.search).get("date")?.trim() || "";
-    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      setSessionDate(date);
-    }
+    setSessionDate(/^\d{4}-\d{2}-\d{2}$/.test(date) ? date : todayIsoLocal());
   }, []);
 
   useEffect(() => {
@@ -58,22 +60,25 @@ export default function NewSessionPage() {
     });
   }, []);
 
-  const selectedIds = useMemo(() => new Set(selected.map((x) => x.exerciseId)), [selected]);
+  // ?from=<sessionId> pre-fills exercises (and location) from an earlier session.
+  useEffect(() => {
+    const from = new URLSearchParams(window.location.search).get("from")?.trim();
+    if (!from) return;
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return library;
-    return library.filter((x) => x.name.toLowerCase().includes(q));
-  }, [library, query]);
-
-  function addExercise(exercise: Exercise) {
-    if (selectedIds.has(exercise.exerciseId)) return;
-    setSelected((prev) => [...prev, exercise]);
-  }
-
-  function removeExercise(exerciseId: string) {
-    setSelected((prev) => prev.filter((x) => x.exerciseId !== exerciseId));
-  }
+    fetch(`/api/sessions?sessionId=${encodeURIComponent(from)}`)
+      .then((res) => res.json())
+      .then((payload) => {
+        const session = payload.session as
+          | { locationId: string; exerciseItems: Array<{ exerciseId: string; name: string }> }
+          | undefined;
+        if (!session) return;
+        setLocationId(session.locationId);
+        setSelected(
+          session.exerciseItems.map((x) => ({ exerciseId: x.exerciseId, name: x.name, notes: "" })),
+        );
+      })
+      .catch(() => setError("Failed to load template session"));
+  }, []);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,7 +92,7 @@ export default function NewSessionPage() {
         body: JSON.stringify({
           sessionDate,
           locationId,
-          exerciseIds: selected.map((x) => x.exerciseId),
+          exerciseItems: toExerciseItems(selected),
         }),
       });
 
@@ -136,53 +141,7 @@ export default function NewSessionPage() {
           </select>
         </div>
 
-        <div className="row" style={{ marginTop: 12 }}>
-          <label htmlFor="exercise-query">Exercises (type to filter)</label>
-          <input
-            id="exercise-query"
-            className="input"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type e.g. Be"
-          />
-        </div>
-
-        <div className="row" style={{ marginTop: 12 }}>
-          <label>Selected exercises</label>
-          <div className="card" style={{ width: "100%", marginBottom: 0 }}>
-            {selected.length === 0 ? <p className="helper">No exercises selected yet.</p> : null}
-            {selected.map((exercise) => (
-              <button
-                key={exercise.exerciseId}
-                type="button"
-                className="button button-exercise"
-                style={{ marginRight: 8, marginBottom: 8 }}
-                onClick={() => removeExercise(exercise.exerciseId)}
-              >
-                {exercise.name} ×
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="row" style={{ marginTop: 12 }}>
-          <label>Exercise list</label>
-          <div className="card" style={{ width: "100%", maxHeight: 320, overflow: "auto", marginBottom: 0 }}>
-            {filtered
-              .filter((x) => !selectedIds.has(x.exerciseId))
-              .map((exercise) => (
-                <button
-                  key={exercise.exerciseId}
-                  type="button"
-                  className="button button-exercise"
-                  style={{ marginRight: 8, marginBottom: 8 }}
-                  onClick={() => addExercise(exercise)}
-                >
-                  + {exercise.name}
-                </button>
-              ))}
-          </div>
-        </div>
+        <ExercisePicker library={library} selected={selected} onChange={setSelected} />
 
         <div style={{ marginTop: 12 }}>
           <button

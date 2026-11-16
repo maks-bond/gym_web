@@ -1,11 +1,18 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { S3Client } from "@aws-sdk/client-s3";
 
 const region = process.env.AWS_REGION || "us-east-2";
 
 const client = new DynamoDBClient({ region });
 
-export const docClient = DynamoDBDocumentClient.from(client);
+export const docClient = DynamoDBDocumentClient.from(client, {
+  marshallOptions: { removeUndefinedValues: true },
+});
+
+export const s3Client = new S3Client({ region });
+
+export const backupsBucket = process.env.BACKUPS_BUCKET || "";
 
 export const tables = {
   sessionsV1:

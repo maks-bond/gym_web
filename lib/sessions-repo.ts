@@ -6,7 +6,8 @@ import {
   ScanCommand,
   type QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
-import { docClient, tables } from "./dynamo";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { backupsBucket, docClient, s3Client, tables } from "./dynamo";
 import type {
   BackupRecord,
   BackupSnapshot,
@@ -496,6 +497,20 @@ export async function createBackup(userId: string): Promise<Omit<BackupRecord, "
   };
 
   const backupId = snapshot.exportedAt;
+  if (!backupsBucket) {
+    throw new Error("BACKUPS_BUCKET is not configured");
+  }
+
+  const s3Key = `backups/${userId}/${backupId}.json`;
+  await s3Client.send(
+    new PutObjectCommand({
+      Bucket: backupsBucket,
+      Key: s3Key,
+      Body: JSON.stringify(snapshot),
+      ContentType: "application/json",
+    }),
+  );
+
   const item: BackupRecord = {
     userId,
     backupId,
@@ -507,7 +522,7 @@ export async function createBackup(userId: string): Promise<Omit<BackupRecord, "
       exercises: exercises.length,
       locations: locations.length,
     },
-    payload: JSON.stringify(snapshot),
+    s3Key,
   };
 
   await docClient.send(
@@ -517,8 +532,7 @@ export async function createBackup(userId: string): Promise<Omit<BackupRecord, "
     }),
   );
 
-  const { payload: _payload, ...meta } = item;
-  return meta;
+  return item;
 }
 
 export async function listBackups(
@@ -563,6 +577,15 @@ export async function getBackup(
   if (!item) return null;
 
   const { payload, ...meta } = item;
+  if (item.s3Key) {
+    const obj = await s3Client.send(
+      new GetObjectCommand({ Bucket: backupsBucket, Key: item.s3Key }),
+    );
+    const body = await obj.Body?.transformToString();
+    if (!body) throw new Error(`Backup object is empty: ${item.s3Key}`);
+    return { meta, snapshot: JSON.parse(body) as BackupSnapshot };
+  }
+  if (!payload) throw new Error(`Backup has no data: ${backupId}`);
   return { meta, snapshot: JSON.parse(payload) as BackupSnapshot };
 }
 
@@ -572,4 +595,74 @@ export async function listSessionsByDate(
 ): Promise<GymSessionView[]> {
   const all = await listSessions(userId);
   return all.filter((x) => x.sessionDate === sessionDate);
+}
+
+export async function rankExercisesByUsage(
+  userId: string,
+): Promise<{ total: number; updated: number; ranked: Exercise[] }> {
+  const [sessions, exercises] = await Promise.all([
+    listRawSessionsV2(userId),
+    listAllExercisesRaw(),
+  ]);
+
+  const usage = new Map<string, number>();
+  for (const session of sessions) {
+    for (const item of session.exerciseItems) {
+      usage.set(item.exerciseId, (usage.get(item.exerciseId) || 0) + 1);
+    }
+  }
+
+  const ranked = [...exercises].sort((a, b) => {
+    const countA = usage.get(a.exerciseId) || 0;
+    const countB = usage.get(b.exerciseId) || 0;
+    if (countA !== countB) return countB - countA;
+    return a.name.localeCompare(b.name);
+  });
+
+  const now = nowIso();
+  const out: Exercise[] = [];
+  const changed: Exercise[] = [];
+
+  ranked.forEach((exercise, i) => {
+    const usageCount = usage.get(exercise.exerciseId) || 0;
+    const sortOrder = i + 1;
+    if (exercise.usageCount === usageCount && exercise.sortOrder === sortOrder) {
+      out.push(exercise);
+      return;
+    }
+    const updated: Exercise = { ...exercise, usageCount, sortOrder, updatedAt: now };
+    changed.push(updated);
+    out.push(updated);
+  });
+
+  await Promise.all(
+    changed.map((item) =>
+      docClient.send(
+        new PutCommand({
+          TableName: tables.exercises,
+          Item: item,
+        }),
+      ),
+    ),
+  );
+
+  return { total: ranked.length, updated: changed.length, ranked: out };
+}
+
+export async function lastNotesByExercise(
+  userId: string,
+): Promise<Record<string, { notes: string; sessionDate: string }>> {
+  const sessions = await listRawSessionsV2(userId);
+  const out: Record<string, { notes: string; sessionDate: string }> = {};
+
+  // Sessions are newest first, so the first note seen per exercise is the latest.
+  for (const session of sessions) {
+    for (const item of session.exerciseItems) {
+      if (item.notes && !out[item.exerciseId]) {
+        out[item.exerciseId] = { notes: item.notes, sessionDate: session.sessionDate };
+      }
+    }
+  }
+
+  return out;
 }

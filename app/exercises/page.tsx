@@ -19,6 +19,8 @@ export default function ExercisesPage() {
   const [editName, setEditName] = useState("");
   const [editAliases, setEditAliases] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isRanking, setIsRanking] = useState(false);
+  const [rankStatus, setRankStatus] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadExercises() {
@@ -37,6 +39,27 @@ export default function ExercisesPage() {
       setError(err instanceof Error ? err.message : "Unknown error");
     });
   }, []);
+
+  async function refreshFrequency() {
+    setIsRanking(true);
+    setRankStatus(null);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/exercises/rank", { method: "POST" });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to refresh frequency");
+      }
+
+      setExercises((payload.exercises || []) as Exercise[]);
+      setRankStatus(`updated ${payload.updated}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setIsRanking(false);
+    }
+  }
 
   function startEdit(exercise: Exercise) {
     setEditingId(exercise.exerciseId);
@@ -125,7 +148,19 @@ export default function ExercisesPage() {
   return (
     <section>
       <h2>Exercises</h2>
-      <p className="helper">Sorted by your configured frequency order.</p>
+      <p className="helper">
+        Sorted by your configured frequency order.
+        <button
+          type="button"
+          className="link-quiet"
+          onClick={refreshFrequency}
+          disabled={isRanking}
+          title="Recount exercise frequency from all sessions"
+        >
+          {isRanking ? "refreshing..." : "refresh"}
+        </button>
+        {rankStatus ? <span> ({rankStatus})</span> : null}
+      </p>
 
       <form className="card" onSubmit={createNewExercise}>
         <h3 style={{ marginTop: 0 }}>Add Exercise</h3>

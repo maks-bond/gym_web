@@ -4,8 +4,10 @@ import {
   getSessionById,
   listLocations,
   listSessions,
+  rankExercisesByUsage,
   upsertSessionV2,
 } from "@/lib/sessions-repo";
+import type { SessionExerciseItem } from "@/lib/types";
 
 const USER_ID = "me";
 
@@ -17,27 +19,41 @@ function isIsoTime(value: string): boolean {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
-function parseAndValidate(body: {
+type SessionBody = {
   sessionId?: string;
   sessionDate?: string;
   startTime?: string;
   endTime?: string;
   locationId?: string;
   exerciseIds?: string[];
+  exerciseItems?: Array<{ exerciseId?: string; notes?: string }>;
   notesRaw?: string;
-}) {
+};
+
+function parseExerciseItems(body: SessionBody): SessionExerciseItem[] {
+  const raw: Array<{ exerciseId?: string; notes?: string }> =
+    body.exerciseItems || (body.exerciseIds || []).map((exerciseId) => ({ exerciseId }));
+  return raw
+    .map((x) => ({
+      exerciseId: (x.exerciseId || "").trim(),
+      notes: (x.notes || "").trim().slice(0, 500) || undefined,
+    }))
+    .filter((x) => x.exerciseId);
+}
+
+function parseAndValidate(body: SessionBody) {
   const sessionId = (body.sessionId || "").trim();
   const sessionDate = (body.sessionDate || "").trim();
   const startTime = (body.startTime || "").trim();
   const endTime = (body.endTime || "").trim();
   const locationId = (body.locationId || "unknown").trim();
-  const exerciseIds = (body.exerciseIds || []).map((x) => x.trim()).filter(Boolean);
+  const exerciseItems = parseExerciseItems(body);
 
   if (!isIsoDate(sessionDate)) {
     return { error: "sessionDate must be YYYY-MM-DD" };
   }
 
-  if (exerciseIds.length === 0) {
+  if (exerciseItems.length === 0) {
     return { error: "At least one exercise is required" };
   }
 
@@ -54,7 +70,7 @@ function parseAndValidate(body: {
     startTime: startTime || undefined,
     endTime: endTime || undefined,
     locationId,
-    exerciseIds,
+    exerciseItems,
     notesRaw: body.notesRaw,
   };
 }
@@ -96,17 +112,9 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+async function saveSession(req: Request, status: number) {
   try {
-    const parsed = parseAndValidate((await req.json()) as {
-      sessionId?: string;
-      sessionDate?: string;
-      startTime?: string;
-      endTime?: string;
-      locationId?: string;
-      exerciseIds?: string[];
-      notesRaw?: string;
-    });
+    const parsed = parseAndValidate((await req.json()) as SessionBody);
 
     if ("error" in parsed) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
@@ -127,55 +135,24 @@ export async function POST(req: Request) {
       startTime: parsed.startTime,
       endTime: parsed.endTime,
       locationId: parsed.locationId,
-      exerciseItems: parsed.exerciseIds.map((exerciseId) => ({ exerciseId })),
+      exerciseItems: parsed.exerciseItems,
       notesRaw: parsed.notesRaw,
     });
 
-    return NextResponse.json({ session }, { status: 201 });
+    // Keep exercise frequency fresh; a failure here must not fail the save.
+    await rankExercisesByUsage(USER_ID).catch((err) => console.error("rank failed", err));
+
+    return NextResponse.json({ session }, { status });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
+export async function POST(req: Request) {
+  return saveSession(req, 201);
+}
+
 export async function PUT(req: Request) {
-  try {
-    const parsed = parseAndValidate((await req.json()) as {
-      sessionId?: string;
-      sessionDate?: string;
-      startTime?: string;
-      endTime?: string;
-      locationId?: string;
-      exerciseIds?: string[];
-      notesRaw?: string;
-    });
-
-    if ("error" in parsed) {
-      return NextResponse.json({ error: parsed.error }, { status: 400 });
-    }
-
-    const validLocationIds = new Set((await listLocations()).map((x) => x.locationId));
-    if (!validLocationIds.has(parsed.locationId)) {
-      return NextResponse.json(
-        { error: `Invalid locationId: ${parsed.locationId}` },
-        { status: 400 },
-      );
-    }
-
-    const session = await upsertSessionV2({
-      userId: USER_ID,
-      sessionId: parsed.sessionId || undefined,
-      sessionDate: parsed.sessionDate,
-      startTime: parsed.startTime,
-      endTime: parsed.endTime,
-      locationId: parsed.locationId,
-      exerciseItems: parsed.exerciseIds.map((exerciseId) => ({ exerciseId })),
-      notesRaw: parsed.notesRaw,
-    });
-
-    return NextResponse.json({ session });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  return saveSession(req, 200);
 }

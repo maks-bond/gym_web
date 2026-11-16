@@ -1,9 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import ExercisePicker, {
+  type Exercise,
+  type SelectedExercise,
+  toExerciseItems,
+} from "../../../components/exercise-picker";
 
-type Exercise = { exerciseId: string; name: string; usageCount?: number };
 type Location = { locationId: string; name: string };
 type SessionPayload = {
   sessionId: string;
@@ -11,7 +15,7 @@ type SessionPayload = {
   startTime?: string;
   endTime?: string;
   locationId: string;
-  exerciseItems: Array<{ exerciseId: string; name?: string }>;
+  exerciseItems: Array<{ exerciseId: string; name?: string; notes?: string }>;
 };
 
 export default function EditSessionPage() {
@@ -22,9 +26,8 @@ export default function EditSessionPage() {
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationId, setLocationId] = useState("unknown");
-  const [query, setQuery] = useState("");
   const [library, setLibrary] = useState<Exercise[]>([]);
-  const [selected, setSelected] = useState<Exercise[]>([]);
+  const [selected, setSelected] = useState<SelectedExercise[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,10 +62,13 @@ export default function EditSessionPage() {
 
       const byId = new Map(loadedExercises.map((x) => [x.exerciseId, x]));
       setSelected(
-        session.exerciseItems.map((item) => byId.get(item.exerciseId) || {
-          exerciseId: item.exerciseId,
-          name: item.name || item.exerciseId,
-        }),
+        session.exerciseItems.map((item) => ({
+          ...(byId.get(item.exerciseId) || {
+            exerciseId: item.exerciseId,
+            name: item.name || item.exerciseId,
+          }),
+          notes: item.notes || "",
+        })),
       );
     }
 
@@ -70,22 +76,6 @@ export default function EditSessionPage() {
       .catch((err) => setError(err instanceof Error ? err.message : "Unknown error"))
       .finally(() => setIsLoading(false));
   }, [sessionId]);
-
-  const selectedIds = useMemo(() => new Set(selected.map((x) => x.exerciseId)), [selected]);
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return library;
-    return library.filter((x) => x.name.toLowerCase().includes(q));
-  }, [library, query]);
-
-  function addExercise(exercise: Exercise) {
-    if (selectedIds.has(exercise.exerciseId)) return;
-    setSelected((prev) => [...prev, exercise]);
-  }
-
-  function removeExercise(exerciseId: string) {
-    setSelected((prev) => prev.filter((x) => x.exerciseId !== exerciseId));
-  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -102,7 +92,7 @@ export default function EditSessionPage() {
           sessionId,
           sessionDate,
           locationId,
-          exerciseIds: selected.map((x) => x.exerciseId),
+          exerciseItems: toExerciseItems(selected),
         }),
       });
 
@@ -153,56 +143,12 @@ export default function EditSessionPage() {
           </select>
         </div>
 
-        <div className="row" style={{ marginTop: 12 }}>
-          <label htmlFor="exercise-query">Exercises (type to filter)</label>
-          <input
-            id="exercise-query"
-            className="input"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type e.g. Be"
-            disabled={isLoading}
-          />
-        </div>
-
-        <div className="row" style={{ marginTop: 12 }}>
-          <label>Selected exercises</label>
-          <div className="card" style={{ width: "100%", marginBottom: 0 }}>
-            {selected.length === 0 ? <p className="helper">No exercises selected yet.</p> : null}
-            {selected.map((exercise) => (
-              <button
-                key={exercise.exerciseId}
-                type="button"
-                className="button button-exercise"
-                style={{ marginRight: 8, marginBottom: 8 }}
-                onClick={() => removeExercise(exercise.exerciseId)}
-                disabled={isLoading}
-              >
-                {exercise.name} x
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="row" style={{ marginTop: 12 }}>
-          <label>Exercise list</label>
-          <div className="card" style={{ width: "100%", maxHeight: 320, overflow: "auto", marginBottom: 0 }}>
-            {filtered
-              .filter((x) => !selectedIds.has(x.exerciseId))
-              .map((exercise) => (
-                <button
-                  key={exercise.exerciseId}
-                  type="button"
-                  className="button button-exercise"
-                  style={{ marginRight: 8, marginBottom: 8 }}
-                  onClick={() => addExercise(exercise)}
-                  disabled={isLoading}
-                >
-                  + {exercise.name}
-                </button>
-              ))}
-          </div>
-        </div>
+        <ExercisePicker
+          library={library}
+          selected={selected}
+          onChange={setSelected}
+          disabled={isLoading}
+        />
 
         <div style={{ marginTop: 12 }}>
           <button

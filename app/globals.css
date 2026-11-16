@@ -269,3 +269,54 @@ body {
   color: var(--muted);
   font-size: 0.92rem;
 }
+
+.link-quiet {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-left: 6px;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+.link-quiet:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.selected-exercise {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.selected-exercise:last-child {
+  border-bottom: 0;
+}
+
+.selected-exercise-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.input-small {
+  padding: 6px 8px;
+  font-size: 0.92rem;
+}
+
+.exercise-notes {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.suggest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}

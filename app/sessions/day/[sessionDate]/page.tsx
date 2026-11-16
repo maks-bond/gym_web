@@ -43,7 +43,10 @@ export default async function SessionDayPage({ params }: Props) {
           </div>
           <ul>
             {session.exerciseItems.map((exercise, i) => (
-              <li key={`${session.sessionDate}-${exercise.exerciseId}-${i}`}>{exercise.name}</li>
+              <li key={`${session.sessionDate}-${exercise.exerciseId}-${i}`}>
+                {exercise.name}
+                {exercise.notes ? <span className="exercise-notes"> — {exercise.notes}</span> : null}
+              </li>
             ))}
           </ul>
         </article>
