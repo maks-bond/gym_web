@@ -320,3 +320,11 @@ body {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.suggest-card summary {
+  cursor: pointer;
+}
+
+.suggest-card summary .helper {
+  margin: 0;
+}

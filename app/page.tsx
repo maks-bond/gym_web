@@ -14,8 +14,8 @@ export default async function HomePage() {
 
   return (
     <section>
-      <SuggestionsCard suggestions={suggestions} />
       <SessionsCalendar sessionDates={sessions.map((x) => x.sessionDate)} />
+      <SuggestionsCard suggestions={suggestions} />
       {sessions.length === 0 ? <p>No sessions yet.</p> : null}
       {sessions.map((session) => (
         <article key={`${session.userId}-${session.sessionId}`} className="card">

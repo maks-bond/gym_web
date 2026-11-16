@@ -9,27 +9,27 @@ function ago(days: number | null): string {
 }
 
 export default function SuggestionsCard({ suggestions }: { suggestions: Suggestions }) {
-  const { nextUp, rotation, stale, lastCardioDaysAgo } = suggestions;
-  if (!nextUp && stale.length === 0) return null;
+  const { nextUp, rotation, lastCardioDaysAgo } = suggestions;
+  if (!nextUp) return null;
 
   return (
-    <article className="card">
-      {nextUp ? (
-        <div className="suggest-row">
-          <div>
-            <h3 style={{ marginBottom: 2 }}>Next up: {nextUp.groups.join(" + ")}</h3>
-            <p className="helper" style={{ marginTop: 0 }}>
-              {nextUp.exampleExercises.join(", ")} · last {ago(nextUp.daysAgo)}
-            </p>
-          </div>
-          <Link
-            href={`/new?from=${encodeURIComponent(nextUp.exampleSessionId)}`}
-            className="button button-link button-small"
-          >
-            Start
-          </Link>
-        </div>
-      ) : null}
+    <details className="card suggest-card">
+      <summary>
+        <strong>Next up: {nextUp.groups.join(" + ")}</strong>
+        <span className="helper"> · last {ago(nextUp.daysAgo)}</span>
+      </summary>
+
+      <div className="suggest-row" style={{ marginTop: 8 }}>
+        <p className="helper" style={{ marginTop: 0 }}>
+          {nextUp.exampleExercises.join(", ")}
+        </p>
+        <Link
+          href={`/new?from=${encodeURIComponent(nextUp.exampleSessionId)}`}
+          className="button button-link button-small"
+        >
+          Start
+        </Link>
+      </div>
 
       {rotation.length > 1 ? (
         <p className="helper">
@@ -46,13 +46,6 @@ export default function SuggestionsCard({ suggestions }: { suggestions: Suggesti
           {lastCardioDaysAgo !== null ? ` · cardio (${lastCardioDaysAgo}d)` : null}
         </p>
       ) : null}
-
-      {stale.length > 0 ? (
-        <p className="helper">
-          Not trained lately:{" "}
-          {stale.map((x) => `${x.group} (${x.daysAgo === null ? "never" : `${x.daysAgo}d`})`).join(", ")}
-        </p>
-      ) : null}
-    </article>
+    </details>
   );
 }
